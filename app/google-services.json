@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "201135207421",
+    "project_id": "relatoriosderotas",
+    "storage_bucket": "relatoriosderotas.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201135207421:android:6ce0175a8f9c840e795f94",
+        "android_client_info": {
+          "package_name": "com.relatriosderotas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "201135207421-u7iutth5pqrbuplbk6pm6meeecsqb2k0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.relatriosderotas",
+            "certificate_hash": "395d35a7ce51100eb144d5cb8ac528dd4c14de89"
+          }
+        },
+        {
+          "client_id": "201135207421-fci2dralm4pq46pm6bosav4tifjfc4l9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeLJiu4zANJYs8RleYCc5zJVFnE6CuTco"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "201135207421-fci2dralm4pq46pm6bosav4tifjfc4l9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

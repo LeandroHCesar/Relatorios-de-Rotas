@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="subTextColor">#7e7e7e</color>
+    <color name="mainBgColor">#ffffff</color>
+    <color name="hairLineColor">#d6d6d6</color>
+    <color name="mainTextColor">#000000</color>
+
+    <color name="black_overlay">#66000000</color>
+
+    <color name="color_default">#03b6fc</color>
+    <color name="color_gray">#707171</color>
+    <color name="color_red">#7E0A0A</color>
+</resources>

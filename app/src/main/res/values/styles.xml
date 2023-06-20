@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="form_buttons">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="cornerRadius">5dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="backgroundTint">@color/color_default</item>
+    </style>
+
+    <style name="TextInputEditText_form" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="boxStrokeColor">@color/color_default</item>
+        <item name="hintTextColor">@color/color_default</item>
+        <item name="endIconMode">clear_text</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextInputEditText_password" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="boxStrokeColor">@color/color_default</item>
+        <item name="hintTextColor">@color/color_default</item>
+        <item name="endIconMode">password_toggle</item>
+    </style>
+
+    <style name="TextInputEditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">14dp</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+</resources>
