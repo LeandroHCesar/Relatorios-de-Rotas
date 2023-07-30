@@ -9,7 +9,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
@@ -25,20 +24,18 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //Initialize Firebase Auth
         auth = Firebase.auth
         initClicks()
     }
 
     private fun initClicks() {
-        binding.buttonLogin.setOnClickListener{ validateData() }
+        binding.buttonLogin.setOnClickListener { validateData() }
 
         binding.textViewCreateNewAccount.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
@@ -53,46 +50,48 @@ class LoginFragment : Fragment() {
         val email = binding.editTextEmail.text.toString().trim()
         val password = binding.editTextPassword.text.toString().trim()
 
-        if (email.isNotEmpty()) {
-            //binding.buttonRegister.isEnabled = true
-            if (password.isNotEmpty()) {
+        val emailLayout = binding.textInputLayoutEmail
+        val passwordLayout = binding.textInputLayoutPassword
 
-                binding.progressBar.isVisible = true
-                //binding.buttonRegister.isEnabled = false
-
-                loginUser(email, password)
-            } else {
-                Toast.makeText(requireContext(), "informe seu senha", Toast.LENGTH_SHORT).show()
-            }
+        if (email.isEmpty()) {
+            emailLayout.error = "Informe seu e-mail"
+            return
         } else {
-            Toast.makeText(requireContext(), "informe seu e-mail", Toast.LENGTH_SHORT).show()
+            emailLayout.error = null
         }
+
+        if (!isValidEmail(email)) {
+            emailLayout.error = "E-mail inválido"
+            return
+        } else {
+            emailLayout.error = null
+        }
+
+        if (password.isEmpty()) {
+            passwordLayout.error = "Informe sua senha"
+            return
+        } else {
+            passwordLayout.error = null
+        }
+
+        loginUser(email, password)
+    }
+
+    private fun isValidEmail(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     private fun loginUser(email: String, password: String) {
+        binding.progressBar.isVisible = true
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(requireActivity()) { task ->
+                binding.progressBar.isVisible = false
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
                     findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                 } else {
-                    // If sign in fails, display a message to the user.
-                    binding.progressBar.isVisible = false
-                    Toast.makeText(requireContext(), "error", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Falha no login. Verifique o e-mail e a senha.", Toast.LENGTH_SHORT).show()
                 }
             }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            //reload()
-            binding.progressBar.isVisible = true
-            findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-            binding.progressBar.isVisible = false
-        }
     }
 
     override fun onDestroyView() {
@@ -100,3 +99,4 @@ class LoginFragment : Fragment() {
         _binding = null
     }
 }
+
