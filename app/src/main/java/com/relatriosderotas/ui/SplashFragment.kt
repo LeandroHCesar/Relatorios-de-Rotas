@@ -18,7 +18,6 @@ import com.relatriosderotas.databinding.FragmentSplashBinding
 class SplashFragment : Fragment() {
 
     private var _binding: FragmentSplashBinding? = null
-    private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(

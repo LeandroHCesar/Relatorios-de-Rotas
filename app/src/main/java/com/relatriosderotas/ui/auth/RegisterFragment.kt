@@ -18,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
 import com.relatriosderotas.databinding.FragmentRegisterBinding
+import com.relatriosderotas.helper.KeyboardUtils
 import com.relatriosderotas.helper.User
 
 class RegisterFragment : Fragment() {
@@ -43,7 +44,10 @@ class RegisterFragment : Fragment() {
     }
 
     private fun initClicks() {
-        binding.buttonRegister.setOnClickListener { validateData() }
+        binding.buttonRegister.setOnClickListener {
+            validateData()
+            KeyboardUtils.hideKeyboard(requireContext(), it)
+        }
     }
 
     private fun validateData() {
