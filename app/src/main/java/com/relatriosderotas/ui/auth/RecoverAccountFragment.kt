@@ -15,6 +15,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
 import com.relatriosderotas.databinding.FragmentRecoverAccountBinding
+import com.relatriosderotas.helper.KeyboardUtils
 
 class RecoverAccountFragment : Fragment() {
 
@@ -37,7 +38,10 @@ class RecoverAccountFragment : Fragment() {
     }
 
     private fun initClicks() {
-        binding.buttonRecover.setOnClickListener { validateData() }
+        binding.buttonRecover.setOnClickListener {
+            validateData()
+            KeyboardUtils.hideKeyboard(requireContext(), it)
+        }
     }
 
     private fun validateData() {

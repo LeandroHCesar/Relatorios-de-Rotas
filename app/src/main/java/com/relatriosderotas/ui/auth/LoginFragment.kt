@@ -14,6 +14,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
 import com.relatriosderotas.databinding.FragmentLoginBinding
+import com.relatriosderotas.helper.KeyboardUtils
 
 class LoginFragment : Fragment() {
 
@@ -36,7 +37,11 @@ class LoginFragment : Fragment() {
     }
 
     private fun initClicks() {
-        binding.buttonLogin.setOnClickListener { validateData() }
+        binding.buttonLogin.setOnClickListener {
+            validateData()
+            // Esconder o teclado após o clique do botão
+            KeyboardUtils.hideKeyboard(requireContext(), it)
+        }
 
         binding.textViewCreateNewAccount.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
