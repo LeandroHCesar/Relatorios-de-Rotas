@@ -80,8 +80,11 @@ class RegisterFragment : Fragment() {
                     // Obter o ID do usuário recém-criado
                     val userId = auth.currentUser?.uid
 
+                    // Formatando o nome com a primeira letra em maiúscula
+                    val formattedName = capitalizeFirstLetter(name)
+
                     // Criar um objeto User com os dados do usuário
-                    val user = User(userId!!, name, email)
+                    val user = User(userId!!, formattedName, email)
 
                     // Referência para o banco de dados "users" no Firebase Realtime Database
                     val userRef: DatabaseReference = database.getReference("users")
@@ -131,6 +134,11 @@ class RegisterFragment : Fragment() {
                 ).show()
             }
         }
+    }
+
+    private fun capitalizeFirstLetter(input: String): String {
+        if (input.isEmpty()) return input
+        return input.substring(0, 1).toUpperCase() + input.substring(1)
     }
 
     override fun onDestroyView() {

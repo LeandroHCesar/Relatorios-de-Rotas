@@ -1,17 +1,17 @@
 package com.relatriosderotas.ui.auth
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -30,23 +30,19 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
     private lateinit var userRef: DatabaseReference
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Configurar a Toolbar
-        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        binding.toolbar.title = "Home" // Defina o título da Toolbar conforme desejado
 
         // Inicializar Firebase Auth
         auth = Firebase.auth
@@ -56,6 +52,37 @@ class HomeFragment : Fragment() {
             val database = FirebaseDatabase.getInstance()
             userRef = database.getReference("users").child(userId)
         }
+        // Configurar a Toolbar
+        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setHomeAsUpIndicator(R.drawable.ic_drawer_menu) // Substitua pelo ícone do Drawer desejado
+            title = "Home"
+            binding.toolbar.setTitleTextAppearance(requireContext(), R.style.ToolbarTitleStyle)
+        }
+
+        // Configurar o clique no ícone do Drawer
+        drawerLayout = binding.drawerLayout
+        binding.toolbar.setNavigationOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+
+        // Referência para o NavigationView
+        navigationView = binding.navigationView
+
+
+        // Configurar o clique nos itens do Drawer
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_logout -> {
+                    logoutUser()
+                    drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
+                    true // Indicar que o clique foi tratado com sucesso
+                }
+                // Outros itens do menu aqui, se houver
+                else -> false // Indicar que o clique não foi tratado
+            }
+        }
 
         userRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -63,7 +90,13 @@ class HomeFragment : Fragment() {
                     val user = snapshot.getValue(User::class.java)
                     if (user != null) {
                         val userName = user.name
-                        binding.textViewUserName.text = "Seja bem vindo, $userName!"
+                        val userEmail = user.email
+                        // Atualizar o texto nas TextViews no nav_header_main
+                        val headerView = binding.navigationView.getHeaderView(0)
+                        headerView.findViewById<TextView>(R.id.textViewNome).text = userName
+                        headerView.findViewById<TextView>(R.id.textViewEmail).text = userEmail
+
+                        binding.textViewUserName.text = "Olá, $userName!"
                     }
                 }
             }
@@ -76,32 +109,9 @@ class HomeFragment : Fragment() {
         })
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_logout -> {
-                // Action goes here
-                logoutUser()
-                Toast.makeText(requireContext(), "sair", Toast.LENGTH_SHORT).show()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
     private fun logoutUser(){
         Firebase.auth.signOut()
-        findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+        findNavController().popBackStack(R.id.loginFragment ,true)
     }
 
     override fun onStart() {
