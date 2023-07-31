@@ -1,6 +1,7 @@
 package com.relatriosderotas.ui.auth
 
 import android.os.Bundle
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -78,7 +79,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun isValidEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     private fun loginUser(email: String, password: String) {
@@ -87,7 +88,9 @@ class LoginFragment : Fragment() {
             .addOnCompleteListener(requireActivity()) { task ->
                 binding.progressBar.isVisible = false
                 if (task.isSuccessful) {
-                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                    // Redirecionar para a HomeFragment
+                    val action = LoginFragmentDirections.actionLoginFragmentToHomeFragment()
+                    findNavController().navigate(action)
                 } else {
                     Toast.makeText(requireContext(), "Falha no login. Verifique o e-mail e a senha.", Toast.LENGTH_SHORT).show()
                 }
@@ -99,4 +102,3 @@ class LoginFragment : Fragment() {
         _binding = null
     }
 }
-

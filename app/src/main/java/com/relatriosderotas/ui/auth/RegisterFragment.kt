@@ -13,15 +13,18 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
 import com.relatriosderotas.databinding.FragmentRegisterBinding
+import com.relatriosderotas.helper.User
 
 class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
-
+    private lateinit var database: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
@@ -34,6 +37,7 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        database = FirebaseDatabase.getInstance()
         auth = Firebase.auth
         initClicks()
     }
@@ -61,18 +65,40 @@ class RegisterFragment : Fragment() {
             binding.editTextPassword.error = "A senha deve conter pelo menos 1 letra maiúscula"
         } else {
             binding.progressBar.isVisible = true
-            registerUser(email, password)
+            registerUser(email, password, name)
         }
     }
 
-    private fun registerUser(email: String, password: String) {
+    private fun registerUser(email: String, password: String, name: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(requireActivity()) { task ->
-                binding.progressBar.isVisible = false
                 if (task.isSuccessful) {
-                    findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
+                    // Obter o ID do usuário recém-criado
+                    val userId = auth.currentUser?.uid
+
+                    // Criar um objeto User com os dados do usuário
+                    val user = User(userId!!, name, email)
+
+                    // Referência para o banco de dados "users" no Firebase Realtime Database
+                    val userRef: DatabaseReference = database.getReference("users")
+
+                    // Salvando o objeto User no banco de dados com o ID do usuário como chave
+                    userRef.child(userId).setValue(user)
+                        .addOnCompleteListener { saveTask ->
+                            if (saveTask.isSuccessful) {
+                                // Sucesso ao salvar os dados do usuário no banco de dados
+                                // Agora, redirecione para a tela HomeFragment
+                                findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
+                            } else {
+                                // Falha ao salvar os dados do usuário no banco de dados
+                                binding.progressBar.isVisible = false
+                                Toast.makeText(requireContext(), "Erro ao salvar os dados do usuário.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                 } else {
-                    handleRegisterError(task.exception)
+                    // Se a criação da conta falhar, exibir mensagem de erro
+                    binding.progressBar.isVisible = false
+                    handleRegisterError(task.exception) // Chama a função handleRegisterError com a exceção recebida
                 }
             }
     }

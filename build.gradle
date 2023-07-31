@@ -1,6 +1,15 @@
 buildscript {
+    ext {
+        kotlin_version = '1.9.0'
+    }
     dependencies {
         classpath 'com.google.gms:google-services:4.3.15'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.android.tools.build:gradle:4.2.0" // Atualize para a versão mais recente
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.6.0"
+    }
+    repositories {
+        mavenCentral()
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
