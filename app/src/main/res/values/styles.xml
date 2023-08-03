@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="ToolbarTitleStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@color/white</item>
+        <!-- Outras propriedades de estilo do texto do título da Toolbar, se necessário -->
+    </style>
 
     <style name="form_buttons">
         <item name="android:layout_width">0dp</item>
