@@ -1,18 +1,17 @@
 package com.relatriosderotas.ui.auth
 
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
-
-import androidx.fragment.app.Fragment
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
-
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -24,30 +23,30 @@ import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
 import com.relatriosderotas.databinding.FragmentHomeBinding
 import com.relatriosderotas.helper.User
-import androidx.drawerlayout.widget.DrawerLayout
-import com.google.android.material.navigation.NavigationView
-
 
 class HomeFragment : Fragment() {
 
-    // Declare as propriedades drawerLayout e navigationView
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
     private lateinit var userRef: DatabaseReference
-    private lateinit var drawerLayout: DrawerLayout // <-- Adicione esta linha
-    private lateinit var navigationView: NavigationView // <-- Adicione esta linha
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // Inflate the layout for this fragment
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Configurar a Toolbar
+        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        binding.toolbar.title = "Home" // Defina o título da Toolbar conforme desejado
 
         // Inicializar Firebase Auth
         auth = Firebase.auth
@@ -57,53 +56,14 @@ class HomeFragment : Fragment() {
             val database = FirebaseDatabase.getInstance()
             userRef = database.getReference("users").child(userId)
         }
-        // Configurar a Toolbar
-        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeAsUpIndicator(R.drawable.ic_drawer_menu) // Substitua pelo ícone do Drawer desejado
-            title = "Home"
-            binding.toolbar.setTitleTextAppearance(requireContext(), R.style.ToolbarTitleStyle)
-        }
-
-        drawerLayout = binding.drawerLayout // <-- Inicialize o drawerLayout aqui
-        binding.toolbar.setNavigationOnClickListener {
-            drawerLayout.openDrawer(GravityCompat.START)
-        }
-
-        // Referência para o NavigationView
-        navigationView = binding.navigationView // <-- Inicialize o navigationView aqui
-
-        // Configurar o clique nos itens do Drawer
-        navigationView.setNavigationItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.nav_logout -> {
-                    logoutUser()
-                    drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
-                    true // Indicar que o clique foi tratado com sucesso
-                }
-                R.id.nav_user -> {
-                    findNavController().navigate(R.id.action_homeFragment_to_personalDataFragment)
-                    drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
-                    true // Indicar que o clique foi tratado com sucesso
-                }
-                // Outros itens do menu aqui, se houver
-                else -> false // Indicar que o clique não foi tratado
-            }
-        }
 
         userRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (_binding != null && isAdded) { // Verifique se o fragmento está vinculado à atividade
                     val user = snapshot.getValue(User::class.java)
-                    val userEmail = snapshot.getValue(User::class.java)
-                    if ((user != null) && (userEmail != null)) {
-                        val userName = user.userName
-                        val userEmail = userEmail.email
-                        // Atualizar o texto nas TextViews no nav_header_main
-                        val headerView = binding.navigationView.getHeaderView(0)
-                        headerView.findViewById<TextView>(R.id.textViewNome).text = userName
-                        headerView.findViewById<TextView>(R.id.textViewEmail).text = userEmail
+                    if (user != null) {
+                        val userName = user.name
+                        binding.textViewUserName.text = "Seja bem vindo, $userName!"
                     }
                 }
             }
@@ -116,23 +76,43 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun logoutUser() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Confirmação")
-        builder.setMessage("Deseja sair da conta?")
-        builder.setPositiveButton("Sim") { _, _ ->
-            // O usuário clicou em "Sim", então faça o logout
-            auth.signOut()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
 
-            // Redirecionar para a tela de login após o logout
-            val action = HomeFragmentDirections.actionHomeFragmentToLoginFragment()
-            findNavController().navigate(action)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_logout -> {
+                // Action goes here
+                logoutUser()
+                Toast.makeText(requireContext(), "sair", Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        builder.setNegativeButton("Não") { dialog, _ ->
-            // O usuário clicou em "Não", então apenas feche o diálogo
-            dialog.dismiss()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun logoutUser(){
+        Firebase.auth.signOut()
+        findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // Verificar se o usuário está logado
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            // Caso o usuário não esteja logado, navegue para o LoginFragment
+            findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
         }
-        builder.create().show()
     }
 
     override fun onDestroyView() {
