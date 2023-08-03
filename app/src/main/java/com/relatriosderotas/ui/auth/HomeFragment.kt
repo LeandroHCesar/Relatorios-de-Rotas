@@ -89,14 +89,12 @@ class HomeFragment : Fragment() {
                 if (_binding != null && isAdded) { // Verifique se o fragmento está vinculado à atividade
                     val user = snapshot.getValue(User::class.java)
                     if (user != null) {
-                        val userName = user.name
+                        val userName = user.userName
                         val userEmail = user.email
                         // Atualizar o texto nas TextViews no nav_header_main
                         val headerView = binding.navigationView.getHeaderView(0)
                         headerView.findViewById<TextView>(R.id.textViewNome).text = userName
                         headerView.findViewById<TextView>(R.id.textViewEmail).text = userEmail
-
-                        binding.textViewUserName.text = "Olá, $userName!"
                     }
                 }
             }
