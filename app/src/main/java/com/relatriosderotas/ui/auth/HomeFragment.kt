@@ -6,12 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
+
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.navigation.NavigationView
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -23,15 +24,19 @@ import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
 import com.relatriosderotas.databinding.FragmentHomeBinding
 import com.relatriosderotas.helper.User
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
+
 
 class HomeFragment : Fragment() {
 
+    // Declare as propriedades drawerLayout e navigationView
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
     private lateinit var userRef: DatabaseReference
-    private lateinit var drawerLayout: DrawerLayout
-    private lateinit var navigationView: NavigationView
+    private lateinit var drawerLayout: DrawerLayout // <-- Adicione esta linha
+    private lateinit var navigationView: NavigationView // <-- Adicione esta linha
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,21 +66,24 @@ class HomeFragment : Fragment() {
             binding.toolbar.setTitleTextAppearance(requireContext(), R.style.ToolbarTitleStyle)
         }
 
-        // Configurar o clique no ícone do Drawer
-        drawerLayout = binding.drawerLayout
+        drawerLayout = binding.drawerLayout // <-- Inicialize o drawerLayout aqui
         binding.toolbar.setNavigationOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
 
         // Referência para o NavigationView
-        navigationView = binding.navigationView
-
+        navigationView = binding.navigationView // <-- Inicialize o navigationView aqui
 
         // Configurar o clique nos itens do Drawer
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_logout -> {
                     logoutUser()
+                    drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
+                    true // Indicar que o clique foi tratado com sucesso
+                }
+                R.id.nav_user -> {
+                    findNavController().navigate(R.id.action_homeFragment_to_personalDataFragment)
                     drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
                     true // Indicar que o clique foi tratado com sucesso
                 }
@@ -88,15 +96,14 @@ class HomeFragment : Fragment() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (_binding != null && isAdded) { // Verifique se o fragmento está vinculado à atividade
                     val user = snapshot.getValue(User::class.java)
-                    if (user != null) {
-                        val userName = user.name
-                        val userEmail = user.email
+                    val userEmail = snapshot.getValue(User::class.java)
+                    if ((user != null) && (userEmail != null)) {
+                        val userName = user.userName
+                        val userEmail = userEmail.email
                         // Atualizar o texto nas TextViews no nav_header_main
                         val headerView = binding.navigationView.getHeaderView(0)
                         headerView.findViewById<TextView>(R.id.textViewNome).text = userName
                         headerView.findViewById<TextView>(R.id.textViewEmail).text = userEmail
-
-                        binding.textViewUserName.text = "Olá, $userName!"
                     }
                 }
             }
@@ -109,20 +116,23 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun logoutUser(){
-        Firebase.auth.signOut()
-        findNavController().popBackStack(R.id.loginFragment ,true)
-    }
+    private fun logoutUser() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Confirmação")
+        builder.setMessage("Deseja sair da conta?")
+        builder.setPositiveButton("Sim") { _, _ ->
+            // O usuário clicou em "Sim", então faça o logout
+            auth.signOut()
 
-    override fun onStart() {
-        super.onStart()
-
-        // Verificar se o usuário está logado
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            // Caso o usuário não esteja logado, navegue para o LoginFragment
-            findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+            // Redirecionar para a tela de login após o logout
+            val action = HomeFragmentDirections.actionHomeFragmentToLoginFragment()
+            findNavController().navigate(action)
         }
+        builder.setNegativeButton("Não") { dialog, _ ->
+            // O usuário clicou em "Não", então apenas feche o diálogo
+            dialog.dismiss()
+        }
+        builder.create().show()
     }
 
     override fun onDestroyView() {

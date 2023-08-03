@@ -16,7 +16,7 @@
     <string name="bt_register">Register</string>
     <string name="bt_login">Login</string>
 
-    <string name="register_hint_editText_newUser_nome">Nome</string>
+    <string name="register_hint_editText_new_User_nome">Nome de Usuário</string>
     <string name="description_img_new_user">img_new_user</string>
     <string name="description_img_login">img_login</string>
     <string name="title_register">Register</string>

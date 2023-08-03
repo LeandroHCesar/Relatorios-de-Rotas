@@ -54,15 +54,15 @@
 
             <!-- Campo de Nome -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayoutNome"
+                android:id="@+id/textInputLayoutUserName"
                 style="@style/TextInputEditText_form"
-                android:hint="@string/register_hint_editText_newUser_nome"
+                android:hint="@string/register_hint_editText_new_User_nome"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ic_new_user">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextNome"
+                    android:id="@+id/editTextUserName"
                     style="@style/TextInputEditText"
                     android:inputType="text" />
 
@@ -76,7 +76,7 @@
                 app:endIconMode="clear_text"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/textInputLayoutNome">
+                app:layout_constraintTop_toBottomOf="@id/textInputLayoutUserName">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextEmail"
