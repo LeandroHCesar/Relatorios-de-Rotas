@@ -51,13 +51,13 @@ class RegisterFragment : Fragment() {
     }
 
     private fun validateData() {
-        val name = binding.editTextNome.text.toString().trim()
+        //val name = binding.editTextNome.text.toString().trim()
         val email = binding.editTextEmail.text.toString().trim()
         val password = binding.editTextPassword.text.toString().trim()
 
-        if (name.isEmpty()) {
+        /*if (name.isEmpty()) {
             binding.editTextNome.error = "Informe seu nome"
-        } else if (email.isEmpty()) {
+        } else */if (email.isEmpty()) {
             binding.editTextEmail.error = "Informe seu e-mail"
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             binding.editTextEmail.error = "E-mail inválido"
@@ -69,11 +69,11 @@ class RegisterFragment : Fragment() {
             binding.editTextPassword.error = "A senha deve conter pelo menos 1 letra maiúscula"
         } else {
             binding.progressBar.isVisible = true
-            registerUser(email, password, name)
+            registerUser(email, password)
         }
     }
 
-    private fun registerUser(email: String, password: String, name: String) {
+    private fun registerUser(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
@@ -81,7 +81,7 @@ class RegisterFragment : Fragment() {
                     val userId = auth.currentUser?.uid
 
                     // Criar um objeto User com os dados do usuário
-                    val user = User(userId!!, name, email)
+                    val user = User(userId!!, email)
 
                     // Referência para o banco de dados "users" no Firebase Realtime Database
                     val userRef: DatabaseReference = database.getReference("users")
