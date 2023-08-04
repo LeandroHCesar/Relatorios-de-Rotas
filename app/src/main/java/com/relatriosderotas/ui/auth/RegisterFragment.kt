@@ -1,6 +1,7 @@
 package com.relatriosderotas.ui.auth
 
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -41,6 +42,18 @@ class RegisterFragment : Fragment() {
         database = FirebaseDatabase.getInstance()
         auth = Firebase.auth
         initClicks()
+
+        // Verificar se existem argumentos recebidos da LoginFragment
+        val args = arguments
+        if (args != null) {
+            val email = args.getString("email")
+            val password = args.getString("password")
+            if (!email.isNullOrEmpty() && !password.isNullOrEmpty()) {
+                // Preencher os campos com o email e senha recebidos
+                binding.editTextEmail.setText(email)
+                binding.editTextPassword.setText(password)
+            }
+        }
     }
 
     private fun initClicks() {
@@ -51,37 +64,46 @@ class RegisterFragment : Fragment() {
     }
 
     private fun validateData() {
-        //val name = binding.editTextNome.text.toString().trim()
+        val name = binding.editTextUserName.text.toString().trim()
         val email = binding.editTextEmail.text.toString().trim()
         val password = binding.editTextPassword.text.toString().trim()
 
-        /*if (name.isEmpty()) {
-            binding.editTextNome.error = "Informe seu nome"
-        } else */if (email.isEmpty()) {
-            binding.editTextEmail.error = "Informe seu e-mail"
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.editTextEmail.error = "E-mail inválido"
-        } else if (password.isEmpty()) {
-            binding.editTextPassword.error = "Informe sua senha"
-        } else if (password.length < 8) {
-            binding.editTextPassword.error = "A senha deve conter pelo menos 8 caracteres"
-        } else if (!password.any { it.isUpperCase() }) {
-            binding.editTextPassword.error = "A senha deve conter pelo menos 1 letra maiúscula"
-        } else {
-            binding.progressBar.isVisible = true
-            registerUser(email, password)
+        // Verificar se todos os campos estão preenchidos
+        if (name.isEmpty()) {
+            binding.editTextUserName.error = "Informe seu nome"
+            return
         }
+        if (email.isEmpty()) {
+            binding.editTextEmail.error = "Informe seu e-mail"
+            return
+        }
+        if (!isValidEmail(email)) {
+            binding.editTextEmail.error = "E-mail inválido"
+            return
+        }
+        if (password.isEmpty()) {
+            binding.editTextPassword.error = "Informe sua senha"
+            return
+        }
+        binding.progressBar.isVisible = true
+        registerUser(email, password, name)
     }
 
-    private fun registerUser(email: String, password: String) {
+    private fun isValidEmail(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    private fun registerUser(email: String, password: String, name: String) {
+        Log.d("RegisterFragment", "Registering user with email: $email, password: $password")
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(requireActivity()) { task ->
+                binding.progressBar.isVisible = false
                 if (task.isSuccessful) {
-                    // Obter o ID do usuário recém-criado
+                    // Sucesso ao registrar o usuário, redirecionar para a HomeFragment
                     val userId = auth.currentUser?.uid
 
                     // Criar um objeto User com os dados do usuário
-                    val user = User(userId!!, email)
+                    val user = User(userId!!, name, email)
 
                     // Referência para o banco de dados "users" no Firebase Realtime Database
                     val userRef: DatabaseReference = database.getReference("users")
@@ -90,22 +112,22 @@ class RegisterFragment : Fragment() {
                     userRef.child(userId).setValue(user)
                         .addOnCompleteListener { saveTask ->
                             if (saveTask.isSuccessful) {
-                                // Sucesso ao salvar os dados do usuário no banco de dados
-                                // Agora, redirecione para a tela HomeFragment
+                                // Sucesso ao registrar o usuário, redirecionar para a HomeFragment
+                                Log.d("RegisterFragment", "User registered successfully.")
                                 findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
                             } else {
-                                // Falha ao salvar os dados do usuário no banco de dados
-                                binding.progressBar.isVisible = false
-                                Toast.makeText(requireContext(), "Erro ao salvar os dados do usuário.", Toast.LENGTH_SHORT).show()
+                                // Tratar falhas ao registrar o usuário
+                                Log.e("RegisterFragment", "Error registering user:", task.exception)
+                                handleRegisterError(task.exception)
                             }
                         }
                 } else {
-                    // Se a criação da conta falhar, exibir mensagem de erro
-                    binding.progressBar.isVisible = false
-                    handleRegisterError(task.exception) // Chama a função handleRegisterError com a exceção recebida
+                    // Tratar falhas ao registrar o usuário
+                    handleRegisterError(task.exception)
                 }
             }
     }
+
 
     private fun handleRegisterError(exception: Exception?) {
         when (exception) {

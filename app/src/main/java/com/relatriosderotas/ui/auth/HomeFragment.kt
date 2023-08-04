@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -43,7 +44,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        drawerLayout = view.findViewById(R.id.drawerLayout)
         // Inicializar Firebase Auth
         auth = Firebase.auth
         val userId = auth.currentUser?.uid
@@ -62,20 +63,23 @@ class HomeFragment : Fragment() {
         }
 
         // Configurar o clique no ícone do Drawer
-        drawerLayout = binding.drawerLayout
         binding.toolbar.setNavigationOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
 
         // Referência para o NavigationView
-        navigationView = binding.navigationView
-
+        navigationView = binding.navigationView // Já deve estar inicializado
 
         // Configurar o clique nos itens do Drawer
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_logout -> {
                     logoutUser()
+                    drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
+                    true // Indicar que o clique foi tratado com sucesso
+                }
+                R.id.nav_user -> {
+                    findNavController().navigate(R.id.action_homeFragment_to_personalDataFragment)
                     drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
                     true // Indicar que o clique foi tratado com sucesso
                 }
@@ -107,9 +111,24 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun logoutUser(){
-        Firebase.auth.signOut()
-        findNavController().popBackStack(R.id.loginFragment ,true)
+    // Em seguida, implemente a função logoutUser() que mostra um AlertDialog de confirmação e realiza o logout:
+    private fun logoutUser() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Confirmação")
+        builder.setMessage("Deseja sair da conta?")
+        builder.setPositiveButton("Sim") { _, _ ->
+            // O usuário clicou em "Sim", então faça o logout
+            auth.signOut()
+
+            // Redirecionar para a tela de login após o logout
+            val action = HomeFragmentDirections.actionHomeFragmentToLoginFragment()
+            findNavController().navigate(action)
+        }
+        builder.setNegativeButton("Não") { dialog, _ ->
+            // O usuário clicou em "Não", então apenas feche o diálogo
+            dialog.dismiss()
+        }
+        builder.create().show()
     }
 
     override fun onStart() {
