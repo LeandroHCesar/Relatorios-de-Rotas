@@ -97,6 +97,7 @@ class LoginFragment : Fragment() {
                     // Sucesso ao autenticar, redirecionar para a HomeFragment
                     val action = LoginFragmentDirections.actionLoginFragmentToHomeFragment()
                     findNavController().navigate(action)
+                    findNavController().popBackStack(R.id.loginFragment, true)
                 } else {
                     // Falha na autenticação, exibir mensagem de erro
                     Toast.makeText(

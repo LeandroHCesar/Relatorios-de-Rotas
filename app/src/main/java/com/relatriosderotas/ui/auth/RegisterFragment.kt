@@ -115,6 +115,7 @@ class RegisterFragment : Fragment() {
                                 // Sucesso ao registrar o usuário, redirecionar para a HomeFragment
                                 Log.d("RegisterFragment", "User registered successfully.")
                                 findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
+                                findNavController().popBackStack(R.id.loginFragment, true)
                             } else {
                                 // Tratar falhas ao registrar o usuário
                                 Log.e("RegisterFragment", "Error registering user:", task.exception)
