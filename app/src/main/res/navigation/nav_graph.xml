@@ -28,7 +28,14 @@
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
-            app:destination="@id/registerFragment" />
+            app:destination="@id/registerFragment" >
+            <argument
+                android:name="email"
+                app:argType="string" />
+            <argument
+                android:name="password"
+                app:argType="string" />
+        </action>
         <action
             android:id="@+id/action_loginFragment_to_recoverAccountFragment"
             app:destination="@id/recoverAccountFragment" />
