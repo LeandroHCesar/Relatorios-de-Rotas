@@ -28,9 +28,7 @@
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
-            app:destination="@id/registerFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true">
+            app:destination="@id/registerFragment" >
             <argument
                 android:name="email"
                 app:argType="string" />
@@ -69,11 +67,7 @@
         tools:layout="@layout/fragment_recover_account">
         <action
             android:id="@+id/action_recoverAccountFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/recoverAccountFragment"
-            app:popUpToInclusive="true">
-
-        </action>
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
@@ -96,8 +90,6 @@
         tools:layout="@layout/fragment_personal_data" >
         <action
             android:id="@+id/action_personalDataFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
-            app:popUpTo="@id/personalDataFragment"
-            app:popUpToInclusive="true"/>
+            app:destination="@id/homeFragment" />
     </fragment>
 </navigation>
