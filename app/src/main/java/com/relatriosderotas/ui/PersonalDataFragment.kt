@@ -137,10 +137,10 @@ class PersonalDataFragment : Fragment() {
 
         if (enabled) {
             btnSave.text = "Salvar"
-            btnSave.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.color_default)) // Cor para o modo de edição
+            btnSave.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.color_red)) // Cor para o modo de edição
         } else {
             btnSave.text = "Editar"
-            btnSave.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.color_gray)) // Cor para o modo de visualização
+            btnSave.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.color_default)) // Cor para o modo de visualização
         }
         setFormFieldsEnabled(enabled)
     }
