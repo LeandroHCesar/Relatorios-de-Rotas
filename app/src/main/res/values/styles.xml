@@ -5,98 +5,59 @@
         <!-- Outras propriedades de estilo do texto do título da Toolbar, se necessário -->
     </style>
 
-    <style name="form_buttons">
-        <item name="android:layout_width">0dp</item>
+    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="cornerRadius">5dp</item>
-        <item name="android:layout_marginTop">10dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="backgroundTint">@color/color_default</item>
-    </style>
-
-    <style name="TextInputEditText_form" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="android:layout_marginTop">10dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
-        <item name="boxStrokeColor">@color/color_default</item>
-        <item name="hintTextColor">@color/color_default</item>
         <item name="endIconMode">clear_text</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="TextInputEditText_password" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="android:layout_marginTop">10dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
         <item name="boxStrokeColor">@color/color_default</item>
-        <item name="hintTextColor">@color/color_default</item>
-        <item name="endIconMode">password_toggle</item>
+        <item name="hintTextColor">@color/colorHintText</item>
+        <item name="android:textColorHint">@color/colorHintText</item>
     </style>
 
-    <style name="TextInputEditText">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:padding">14dp</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="progressBar">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:visibility">invisible</item>
-        <item name="android:indeterminateTint">@color/color_default</item>
-    </style>
-
-    <!-- Estilos para os TextInputLayouts -->
-    <style name="TextInputLayoutStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@color/color_bg</item>
-        <item name="cornerRadius">8dp</item>
-    </style>
-
-    <!-- Estilos para os TextInputEditTexts -->
-    <style name="TextInputEditTextStyle">
+    <style name="TextInputEditTextStyle" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/color_text_principal</item>
     </style>
 
-    <!-- Estilos para os TextInputLayouts usados para campos pequenos -->
-    <style name="TextInputEditText_form_small">
+    <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:textColor">@color/colorButtonText</item>
+        <item name="backgroundTint">@color/colorButtonBackground</item>
     </style>
 
-    <!-- Definição de Estilo para o Container de Formulário -->
+    <style name="ProgressBarStyle" parent="Widget.Material3.CircularProgressIndicator">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:visibility">visible</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:indeterminateTint">@color/color_default</item>
+    </style>
+
+    <!--Definição de Estilo para o Container de Formulário-->
     <style name="FormContainer">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/bg_form</item>
         <item name="android:padding">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="cornerRadius">8dp</item>
-        <!-- Outros atributos de estilo desejados -->
+        <item name="android:layout_marginTop">10dp</item>
     </style>
 
-    <!-- Definição de Estilo para o Botão -->
-    <style name="ButtonStyle">
-    <item name="android:layout_width">0dp</item>
-    <item name="android:layout_height">wrap_content</item>
-    <item name="android:textColor">@android:color/white</item>
-    <item name="android:backgroundTint">@color/color_default</item>
-    <item name="android:textSize">16sp</item>
-    <item name="android:paddingStart">16dp</item>
-    <item name="android:paddingEnd">16dp</item>
-    <item name="cornerRadius">12dp</item>
-    <!-- Outros atributos de estilo desejados -->
+    <!-- Estilos para os TextInputLayouts usados para campos pequenos   -->
+    <style name="TextInputEditText_form_small">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">14sp</item>
+        <item name="boxStrokeColor">@color/color_default</item>
+        <item name="hintTextColor">@color/color_default</item>
+        <item name="endIconMode">clear_text</item>
     </style>
+
 </resources>

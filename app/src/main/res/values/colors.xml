@@ -3,14 +3,21 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="subTextColor">#7e7e7e</color>
-    <color name="mainBgColor">#ffffff</color>
-    <color name="hairLineColor">#d6d6d6</color>
-    <color name="mainTextColor">#000000</color>
+    <color name="colorButtonText">#FFFFFFFF</color>
+    <color name="colorButtonBackground">#03b6fc</color>
 
-    <color name="black_overlay">#66000000</color>
+    <color name="color_secondary">#0283d0</color>
+    <color name="color_destaque">#ff5722</color>
+
+    <color name="color_text_principal">#333333</color>
+    <color name="color_text_secondary">#666666</color>
+    <color name="colorHintText">#66000000</color>
 
     <color name="color_default">#03b6fc</color>
-    <color name="color_bg">#E8E5E5</color>
-    <color name="color_red">#7E0A0A</color>
+
+    <color name="color_bg_light">#f5f5f5</color>
+    <color name="color_bg_dark">#212121</color>
+
+    <color name="color_red_error">#f44336</color>
+    <color name="color_green_success">#4caf50</color>
 </resources>

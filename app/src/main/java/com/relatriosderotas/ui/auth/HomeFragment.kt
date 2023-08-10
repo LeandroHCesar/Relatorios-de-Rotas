@@ -23,13 +23,15 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
 import com.relatriosderotas.databinding.FragmentHomeBinding
-import com.relatriosderotas.helper.User
+import com.relatriosderotas.helper.UserInformation
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
+    private var database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val databaseRef: DatabaseReference = database.reference
     private lateinit var userRef: DatabaseReference
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
@@ -50,8 +52,7 @@ class HomeFragment : Fragment() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
             // Referência para o banco de dados "users" no Firebase Realtime Database
-            val database = FirebaseDatabase.getInstance()
-            userRef = database.getReference("users").child(userId)
+            userRef = databaseRef.child("meus_apps").child("relatorio_de_rotas").child("users").child(userId!!)
         }
         // Configurar a Toolbar
         (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
@@ -78,8 +79,13 @@ class HomeFragment : Fragment() {
                     drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
                     true // Indicar que o clique foi tratado com sucesso
                 }
-                R.id.nav_user -> {
+                R.id.nav_datas -> {
                     findNavController().navigate(R.id.action_homeFragment_to_personalDataFragment)
+                    drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
+                    true // Indicar que o clique foi tratado com sucesso
+                }
+                R.id.nav_rota -> {
+                    findNavController().navigate(R.id.action_homeFragment_to_rotasFragment)
                     drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
                     true // Indicar que o clique foi tratado com sucesso
                 }
@@ -91,7 +97,7 @@ class HomeFragment : Fragment() {
         userRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (_binding != null && isAdded) { // Verifique se o fragmento está vinculado à atividade
-                    val user = snapshot.getValue(User::class.java)
+                    val user = snapshot.getValue(UserInformation::class.java)
                     if (user != null) {
                         val userName = user.userName
                         val userEmail = user.email

@@ -21,10 +21,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/create_new_account"
+                android:text="@string/recover_account"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"/>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -38,42 +38,28 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/container_register"
+            android:id="@+id/container_recover"
             style="@style/FormContainer"
             android:layout_marginHorizontal="8dp">
 
-            <!-- Aqui começa o seu layout de registro -->
+            <!-- Aqui começa o seu layout de recuperação de senha -->
 
             <ImageView
                 android:id="@+id/ic_new_user"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:contentDescription="@string/description_img_new_user"
-                android:src="@drawable/ic_new_user"
-                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                android:src="@drawable/ic_password"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayoutUserName"
-                style="@style/TextInputLayoutStyle"
-                android:hint="@string/register_hint_editText_new_User_nome"
-                app:layout_constraintTop_toBottomOf="@id/ic_new_user"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextUserName"
-                    style="@style/TextInputEditTextStyle"
-                    android:inputType="textCapWords" />
-
-            </com.google.android.material.textfield.TextInputLayout>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayoutEmail"
                 style="@style/TextInputLayoutStyle"
                 android:hint="@string/email"
-                app:layout_constraintTop_toBottomOf="@id/textInputLayoutUserName"
+                app:endIconMode="clear_text"
+                app:layout_constraintTop_toBottomOf="@id/ic_new_user"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
@@ -84,39 +70,23 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayoutPassword"
-                style="@style/TextInputLayoutStyle"
-                android:hint="@string/password"
-                app:layout_constraintTop_toBottomOf="@id/textInputLayoutEmail"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextPassword"
-                    style="@style/TextInputEditTextStyle"
-                    app:endIconMode="password_toggle"
-                    android:inputType="textPassword" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonRegister"
+                android:id="@+id/buttonRecover"
                 style="@style/ButtonStyle"
-                android:text="@string/create_new_account"
-                app:layout_constraintTop_toBottomOf="@id/textInputLayoutPassword"
+                android:text="@string/recover_account"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayoutEmail"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
             <ProgressBar
                 android:id="@+id/progressBar"
                 style="@style/ProgressBarStyle"
-                app:layout_constraintTop_toBottomOf="@id/buttonRegister"
+                app:layout_constraintTop_toBottomOf="@+id/buttonRecover"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:visibility="visible" />
 
-            <!-- Aqui termina o seu layout de registro -->
+            <!-- Aqui termina o seu layout de recuperação de senha -->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

@@ -13,11 +13,11 @@
                 android:icon="@drawable/ic_menu_camera"
                 android:title="Home" />
             <item
-                android:id="@+id/nav_gallery"
-                android:icon="@drawable/ic_menu_gallery"
-                android:title="Gallery" />
+                android:id="@+id/nav_rota"
+                android:icon="@drawable/ic_rota"
+                android:title="Novas Rotas" />
             <item
-                android:id="@+id/nav_user"
+                android:id="@+id/nav_datas"
                 android:icon="@drawable/ic_data_user"
                 android:title="Dados Pessoais" />
         </menu>
@@ -29,7 +29,7 @@
         <menu>
             <item
                 android:id="@+id/nav_logout"
-                android:title="Logout"
+                android:title="Sair"
                 android:icon="@drawable/ic_logout"/>
         </menu>
     </item>

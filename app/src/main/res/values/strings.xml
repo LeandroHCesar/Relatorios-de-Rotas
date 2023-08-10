@@ -23,4 +23,18 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="nav_header_title">Nome de Usuário</string>
+    <string name="nav_header_subtitle">email@example.com</string>
+    <string name="login">Login</string>
+
+    <string-array name="valores_cidades_array">
+            <item>R$ 0,00</item>
+            <item>R$ 223,00</item>
+            <item>R$ 263,00</item>
+            <item>R$ 283,00</item>
+            <item>R$ 313,00</item>
+            <item>R$ 330,00</item>
+         </string-array>
+
+
 </resources>

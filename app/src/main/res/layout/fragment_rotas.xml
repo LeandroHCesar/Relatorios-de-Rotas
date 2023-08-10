@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_bg_light"
+    tools:context=".ui.MainActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/color_default"
+            app:popupTheme="@style/Theme.RelatóriosDeRotas" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView_form"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+
+            <!-- Adicione os elementos, estilos e constraints conforme necessário -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/container_dados_rotas"
+                style="@style/FormContainer"
+                android:layout_marginHorizontal="8dp">
+
+                <!-- Linha 1: Data e ID da Rota -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutData"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Data"
+                    app:layout_constraintEnd_toStartOf="@id/textInputLayoutId"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:nextFocusLeft="@id/textInputLayoutId">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextData"
+                        style="@style/TextInputEditTextStyle"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:clickable="true"
+                        android:onClick="showDatePickerDialog"
+                        android:inputType="none" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutId"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="ID da Rota"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/textInputLayoutData"
+                    app:layout_constraintTop_toTopOf="@id/textInputLayoutData"
+                    android:nextFocusDown="@id/textInputLayoutDescricaoCidades">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextId"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="textCapWords" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Linha 2: Descrição das Cidades -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutDescricaoCidades"
+                    style="@style/TextInputLayoutStyle"
+                    android:hint="Descrição das Cidades"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutId"
+                    android:nextFocusDown="@id/textInputLayoutCodRota">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextDescricaoCidades"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="textCapWords" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Campo de Cod. Rota e Km -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutCodRota"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Cod. Rota"
+                    app:layout_constraintEnd_toStartOf="@id/textInputLayoutKm"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutDescricaoCidades"
+                    android:nextFocusLeft="@id/textInputLayoutKm">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextCodRota"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="textCapSentences" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutKm"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Km"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/textInputLayoutCodRota"
+                    app:layout_constraintTop_toTopOf="@id/textInputLayoutCodRota"
+                    android:nextFocusForward="@id/textInputLayoutParadas">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextKm"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="numberDecimal" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Linha 4: Paradas e Pacotes -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutParadas"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Paradas"
+                    app:layout_constraintEnd_toStartOf="@id/textInputLayoutPacotes"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutKm"
+                    android:nextFocusForward="@id/textInputLayoutPacotes">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextParadas"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutPacotes"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Pacotes"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/textInputLayoutParadas"
+                    app:layout_constraintTop_toTopOf="@id/textInputLayoutParadas"
+                    android:nextFocusForward="@id/textInputLayoutDiaria">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextPacotes"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Linha 5: Valor Diária e Adicional -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutDiaria"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Diária"
+                    app:layout_constraintEnd_toStartOf="@id/textInputLayoutAdicional"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutPacotes">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextDiaria"
+                        style="@style/TextInputEditTextStyle"
+                        android:editable="false"
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:inputType="numberDecimal" />
+                        <!--android:text="R$ 0,00"-->
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutAdicional"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Adicional"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/textInputLayoutDiaria"
+                    app:layout_constraintTop_toTopOf="@id/textInputLayoutDiaria">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextAdicional"
+                        style="@style/TextInputEditTextStyle"
+                        android:editable="false"
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:inputType="numberDecimal" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Linha 6: Pedágio e Combustível -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutPedagio"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Pedágio"
+                    app:layout_constraintEnd_toStartOf="@id/textInputLayoutCombustivel"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutAdicional"
+                    android:nextFocusForward="@id/textInputLayoutCombustivel">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextPedagio"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="numberDecimal" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutCombustivel"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Combustível"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/textInputLayoutPedagio"
+                    app:layout_constraintTop_toTopOf="@id/textInputLayoutPedagio"
+                    android:nextFocusForward="@id/spinnerValoresCidades">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextCombustivel"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="numberDecimal" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Switch Domingos e Feriados style="@style/SwitchStyle"-->
+                <Switch
+                    android:id="@+id/switchDomingosFeriados"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Domingos e Feriados"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutCombustivel"
+                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                <Spinner
+                    android:id="@+id/spinnerValoresCidades"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:prompt="@array/valores_cidades_array"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/switchDomingosFeriados" />
+
+                <!-- Botão Adicionar Nova Rota -->
+                <Button
+                    android:id="@+id/buttonAdicionarRota"
+                    style="@style/ButtonStyle"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Adicionar Nova Rota"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/spinnerValoresCidades" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

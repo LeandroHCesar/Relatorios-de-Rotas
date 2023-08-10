@@ -14,12 +14,12 @@ import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
-import com.relatriosderotas.databinding.FragmentRecoverAccountBinding
+import com.relatriosderotas.databinding.FragmentRecoverBinding
 import com.relatriosderotas.helper.KeyboardUtils
 
 class RecoverAccountFragment : Fragment() {
 
-    private var _binding: FragmentRecoverAccountBinding? = null
+    private var _binding: FragmentRecoverBinding? = null
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
 
@@ -27,7 +27,7 @@ class RecoverAccountFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentRecoverAccountBinding.inflate(inflater, container, false)
+        _binding = FragmentRecoverBinding.inflate(inflater, container, false)
         return binding.root
     }
 
