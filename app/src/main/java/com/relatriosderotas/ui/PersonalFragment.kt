@@ -1,6 +1,7 @@
 package com.relatriosderotas.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,15 +18,15 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
-import com.relatriosderotas.databinding.FragmentPersonalDataBinding
+import com.relatriosderotas.databinding.FragmentPersonalBinding
 import com.relatriosderotas.helper.KeyboardUtils
-import com.relatriosderotas.helper.User
 import com.relatriosderotas.helper.UserData
 
-class PersonalDataFragment : Fragment() {
+class PersonalFragment : Fragment() {
 
-    private var _binding: FragmentPersonalDataBinding? = null
+    private var _binding: FragmentPersonalBinding? = null
     private val binding get() = _binding!!
+
     private var isEditMode = false
     private var database: FirebaseDatabase = FirebaseDatabase.getInstance()
     private val databaseRef: DatabaseReference = database.reference
@@ -36,67 +37,75 @@ class PersonalDataFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentPersonalDataBinding.inflate(inflater, container, false)
+        _binding = FragmentPersonalBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Configurar a Toolbar
-        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeAsUpIndicator(R.drawable.ic_back_arrow_white) // Defina o ícone personalizado aqui
-            title = "Dados do Usuário"
-            binding.toolbar.setTitleTextAppearance(requireContext(), R.style.ToolbarTitleStyle)
-        }
-        // Configurar o clique na seta de voltar
-        binding.toolbar.setNavigationOnClickListener {
-            requireActivity().onBackPressed()
-        }
-        val firebaseAuth = FirebaseAuth.getInstance()
-        val currentUser: FirebaseUser? = firebaseAuth.currentUser
+        // Certifique-se de que _binding não seja nulo antes de usá-lo
+        when {
+            _binding != null ->{
+                // Configurar a Toolbar
+                (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+                (activity as AppCompatActivity).supportActionBar?.apply {
+                    setDisplayHomeAsUpEnabled(true)
+                    setHomeAsUpIndicator(R.drawable.ic_back_arrow_white) // Defina o ícone personalizado aqui
+                    title = "Dados do Usuário"
+                    binding.toolbar.setTitleTextAppearance(requireContext(), R.style.ToolbarTitleStyle)
+                }
+                // Configurar o clique na seta de voltar
+                binding.toolbar.setNavigationOnClickListener {
+                    requireActivity().onBackPressed()
+                }
+                val firebaseAuth = FirebaseAuth.getInstance()
+                val currentUser: FirebaseUser? = firebaseAuth.currentUser
 
-        database = FirebaseDatabase.getInstance()
-        auth = Firebase.auth
-        setupViews()
+                database = FirebaseDatabase.getInstance()
+                auth = Firebase.auth
+                setupViews()
 
-        // Verifique se o usuário está autenticado
-        if (currentUser != null) {
-            // Obtenha o ID do usuário autenticado
-            userId = currentUser.uid
-            // Obtenha o ID do usuário autenticado
-            userId?.let { uid ->
-                // Obtenha a referência para o nó "users" no banco de dados para o usuário atual
-                val userRef = databaseRef.child("users").child(uid)
+                // Verifique se o usuário está autenticado
+                if (currentUser != null) {
+                    // Obtenha o ID do usuário autenticado
+                    userId = currentUser.uid
+                    // Obtenha o ID do usuário autenticado
+                    userId?.let { uid ->
+                        // Obtenha a referência para o nó "users" no banco de dados para o usuário atual
+                        val userRef = databaseRef.child("meus_apps").child("relatorio_de_rotas").child("users").child(uid)
 
-                // Adicione um listener para ouvir as alterações nos dados do usuário
-                userRef.addValueEventListener(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        // Obtenha o objeto UserData do snapshot
-                        val userData = snapshot.getValue(UserData::class.java)
+                        // Adicione um listener para ouvir as alterações nos dados do usuário
+                        userRef.addValueEventListener(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                Log.d("PersonalDataFragment", "onDataChange: Snapshot: $snapshot")
 
-                        // Se o objeto UserData não for nulo, atualize os campos de edição com os dados do usuário
-                        userData?.let { data ->
-                            binding.editTextNomeCompleto.setText(data.nomeCompleto)
-                            binding.editTextCpf.setText(data.cpf)
-                            binding.editTextVeiculo.setText(data.veiculo)
-                            binding.editTextPlaca.setText(data.placa)
-                            binding.editTextTitular.setText(data.titular)
-                            binding.editTextCnpj.setText(data.cnpj)
-                            binding.editTextBanco.setText(data.banco)
-                            binding.editTextAgencia.setText(data.agencia)
-                            binding.editTextConta.setText(data.conta)
-                            binding.editTextPix.setText(data.pix)
-                            // Atualize outros campos aqui, se houver
-                        }
+                                // Obtenha o objeto UserData do snapshot
+                                val userData = snapshot.getValue(UserData::class.java)
+                                Log.d("PersonalDataFragment", "onDataChange: UserData: $userData")
+
+                                // Se o objeto UserData não for nulo, atualize os campos de edição com os dados do usuário
+                                userData?.let { data ->
+                                    binding.editTextNomeCompleto.setText(data.nomeCompleto)
+                                    binding.editTextCpf.setText(data.cpf)
+                                    binding.editTextVeiculo.setText(data.veiculo)
+                                    binding.editTextPlaca.setText(data.placa)
+                                    binding.editTextTitular.setText(data.titular)
+                                    binding.editTextCnpj.setText(data.cnpj)
+                                    binding.editTextBanco.setText(data.banco)
+                                    binding.editTextAgencia.setText(data.agencia)
+                                    binding.editTextConta.setText(data.conta)
+                                    binding.editTextPix.setText(data.pix)
+                                    // Atualize outros campos aqui, se houver
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                // Tratar erros, se necessário
+                            }
+                        })
                     }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        // Tratar erros, se necessário
-                    }
-                })
+                }
             }
         }
     }
@@ -104,7 +113,7 @@ class PersonalDataFragment : Fragment() {
     private fun setupViews() {
         // Obtenha referências das views através do binding
         val btnSave = binding.buttonSalvar
-        val editTextNomeCompleto = binding.editTextNomeCompleto
+        /*val editTextNomeCompleto = binding.editTextNomeCompleto
         val editTextCpf = binding.editTextCpf
         val editTextVeiculo = binding.editTextVeiculo
         val editTextPlaca = binding.editTextPlaca
@@ -113,7 +122,7 @@ class PersonalDataFragment : Fragment() {
         val editTextBanco = binding.editTextBanco
         val editTextAgencia = binding.editTextAgencia
         val editTextConta = binding.editTextConta
-        val editTextPix = binding.editTextPix
+        val editTextPix = binding.editTextPix*/
 
         // Configure os cliques dos botões
         btnSave.setOnClickListener {
@@ -137,10 +146,10 @@ class PersonalDataFragment : Fragment() {
 
         if (enabled) {
             btnSave.text = "Salvar"
-            btnSave.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.color_default)) // Cor para o modo de edição
+            btnSave.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.color_destaque)) // Cor para o modo de edição
         } else {
             btnSave.text = "Editar"
-            btnSave.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.color_gray)) // Cor para o modo de visualização
+            btnSave.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.color_default)) // Cor para o modo de visualização
         }
         setFormFieldsEnabled(enabled)
     }
@@ -285,7 +294,7 @@ class PersonalDataFragment : Fragment() {
             )
 
             // Crie ou atualize os dados do usuário no banco de dados
-            val userRef = databaseRef.child("users").child(userId!!)
+            val userRef = databaseRef.child("meus_apps").child("relatorio_de_rotas").child("users").child(userId!!)
             userRef.updateChildren(userDataMap as Map<String, Any>)
                 .addOnSuccessListener {
                     // Sucesso ao salvar os dados

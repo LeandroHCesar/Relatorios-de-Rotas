@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_bg_light"
+    tools:context=".ui.MainActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/color_default"
+            app:popupTheme="@style/Theme.RelatóriosDeRotas" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView_form"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp">
+
+            <!-- Container de Dados Pessoais -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/container_dados_pessoais"
+                style="@style/FormContainer"
+                app:layout_constraintEnd_toEndOf="@id/container"
+                app:layout_constraintStart_toStartOf="@id/container"
+                app:layout_constraintTop_toTopOf="@id/container">
+
+                <!-- Campo de Nome Completo -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutNomeCompleto"
+                    style="@style/TextInputLayoutStyle"
+                    android:hint="Nome Completo"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextNomeCompleto"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="textCapWords"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Campo de CPF -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutCpf"
+                    style="@style/TextInputLayoutStyle"
+                    android:hint="CPF"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutNomeCompleto">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextCpf"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Campo de CNPJ -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutCnpj"
+                    style="@style/TextInputLayoutStyle"
+                    android:hint="CNPJ"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutCpf">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextCnpj"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Container de Dados de Veículos -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/container_dados_veiculos"
+                style="@style/FormContainer"
+                app:layout_constraintEnd_toEndOf="@id/container"
+                app:layout_constraintStart_toStartOf="@id/container"
+                app:layout_constraintTop_toBottomOf="@+id/container_dados_pessoais">
+
+                <!-- Campo de Veículo -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutVeiculo"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Veículo"
+                    app:layout_constraintEnd_toStartOf="@+id/textInputLayoutPlaca"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextVeiculo"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="textCapWords"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Campo de Placa -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutPlaca"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Placa do veículo"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/textInputLayoutVeiculo"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextPlaca"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="textCapWords" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Container de Dados Bancários -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/container_dados_bancarios"
+                style="@style/FormContainer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/container_dados_veiculos">
+
+                <!-- Titular da Conta -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutTitular"
+                    style="@style/TextInputLayoutStyle"
+                    android:hint="Titular da conta"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextTitular"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="textCapWords" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Número do Banco -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutBanco"
+                    style="@style/TextInputLayoutStyle"
+                    android:hint="Número do Banco"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutTitular">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextBanco"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="text" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Agência -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutAgencia"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Agência"
+                    app:layout_constraintEnd_toStartOf="@id/textInputLayoutConta"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutBanco">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextAgencia"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Conta -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutConta"
+                    style="@style/TextInputEditText_form_small"
+                    android:hint="Conta"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/textInputLayoutAgencia"
+                    app:layout_constraintTop_toTopOf="@id/textInputLayoutAgencia">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextConta"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- PIX -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutPix"
+                    style="@style/TextInputLayoutStyle"
+                    android:hint="PIX"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutConta">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextPix"
+                        style="@style/TextInputEditTextStyle"
+                        android:inputType="text" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Botão Salvar -->
+            <Button
+                android:id="@+id/buttonSalvar"
+                style="@style/ButtonStyle"
+                android:text="Salvar"
+                app:layout_constraintTop_toBottomOf="@id/container_dados_bancarios"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="16dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

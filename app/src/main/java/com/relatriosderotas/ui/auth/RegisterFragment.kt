@@ -16,11 +16,12 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
 import com.relatriosderotas.databinding.FragmentRegisterBinding
 import com.relatriosderotas.helper.KeyboardUtils
-import com.relatriosderotas.helper.User
+import com.relatriosderotas.helper.UserInformation
 
 class RegisterFragment : Fragment() {
 
@@ -39,7 +40,8 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        database = FirebaseDatabase.getInstance()
+
+        database = Firebase.database
         auth = Firebase.auth
         initClicks()
 
@@ -95,31 +97,42 @@ class RegisterFragment : Fragment() {
 
     private fun registerUser(email: String, password: String, name: String) {
         Log.d("RegisterFragment", "Registering user with email: $email, password: $password")
+
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(requireActivity()) { task ->
                 binding.progressBar.isVisible = false
                 if (task.isSuccessful) {
-                    // Sucesso ao registrar o usuário, redirecionar para a HomeFragment
                     val userId = auth.currentUser?.uid
 
                     // Criar um objeto User com os dados do usuário
-                    val user = User(userId!!, name, email)
+                    val user = UserInformation(userId!!, name, email)
 
-                    // Referência para o banco de dados "users" no Firebase Realtime Database
-                    val userRef: DatabaseReference = database.getReference("users")
+                    // Referência para o nó "meus_apps"
+                    val meusAppsRef: DatabaseReference = database.reference.child("meus_apps")
 
-                    // Salvando o objeto User no banco de dados com o ID do usuário como chave
-                    userRef.child(userId).setValue(user)
-                        .addOnCompleteListener { saveTask ->
-                            if (saveTask.isSuccessful) {
-                                // Sucesso ao registrar o usuário, redirecionar para a HomeFragment
-                                Log.d("RegisterFragment", "User registered successfully.")
-                                findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
-                                findNavController().popBackStack(R.id.loginFragment, true)
+                    // Referência para o nó "relatorio_de_rotas" dentro de "meus_apps"
+                    val relatorioRef: DatabaseReference = meusAppsRef.child("relatorio_de_rotas")
+
+                    // Referência para o nó "users" dentro de "relatorio_de_rotas"
+                    val usersRef: DatabaseReference = relatorioRef.child("users")
+
+                    // Referência para o nó correspondente ao userId dentro de "users"
+                    val userAppRef: DatabaseReference = usersRef.child(userId)
+
+                    //Salvando o objeto User no nó correspondente ao userId dentro de "users"
+                    userAppRef.setValue(user)
+                        .addOnCompleteListener { userAppSaveTask ->
+                            if (userAppSaveTask.isSuccessful) {
+                                Log.d("RegisterFragment", "User info saved in new structure successfully.")
+
+                                // Redirecionar para a HomeFragment
+                                findNavController().apply {
+                                    navigate(R.id.action_registerFragment_to_homeFragment)
+                                    popBackStack(R.id.loginFragment, false)
+                                }
                             } else {
-                                // Tratar falhas ao registrar o usuário
-                                Log.e("RegisterFragment", "Error registering user:", task.exception)
-                                handleRegisterError(task.exception)
+                                Log.e("RegisterFragment", "Error saving user info in new structure:", userAppSaveTask.exception)
+                                handleRegisterError(userAppSaveTask.exception)
                             }
                         }
                 } else {
@@ -128,7 +141,6 @@ class RegisterFragment : Fragment() {
                 }
             }
     }
-
 
     private fun handleRegisterError(exception: Exception?) {
         when (exception) {
