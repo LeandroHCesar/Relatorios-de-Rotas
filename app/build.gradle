@@ -13,8 +13,8 @@ android {
         applicationId "com.relatriosderotas"
         minSdk 24
         targetSdk 34
-        versionCode 4
-        versionName '3.10'
+        versionCode 5
+        versionName '5.10'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -49,6 +49,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
+    //implementation 'com.thoughtbot:expandablerecyclerview:1.4'
 
     //Navigation
     def nav_version = '2.6.0'

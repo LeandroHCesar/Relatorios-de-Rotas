@@ -73,7 +73,7 @@
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.relatriosderotas.ui.auth.HomeFragment"
+        android:name="com.relatriosderotas.ui.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -90,7 +90,7 @@
     </fragment>
     <fragment
         android:id="@+id/personalDataFragment"
-        android:name="com.relatriosderotas.ui.PersonalDataFragment"
+        android:name="com.relatriosderotas.ui.PersonalFragment"
         android:label="fragment_personal_data"
         tools:layout="@layout/fragment_personal" >
         <action

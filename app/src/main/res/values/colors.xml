@@ -11,6 +11,8 @@
 
     <color name="color_text_principal">#333333</color>
     <color name="color_text_secondary">#666666</color>
+    <color name="disabled_text_color">#A0A0A0</color>
+
     <color name="colorHintText">#66000000</color>
 
     <color name="color_default">#03b6fc</color>

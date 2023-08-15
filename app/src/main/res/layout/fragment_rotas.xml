@@ -74,7 +74,7 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextId"
                         style="@style/TextInputEditTextStyle"
-                        android:inputType="textCapWords" />
+                        android:inputType="number" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -164,21 +164,18 @@
                 <!-- Linha 5: Valor Diária e Adicional -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/textInputLayoutDiaria"
-                    style="@style/TextInputEditText_form_small"
+                    style="@style/TextInputEditText_exposed"
                     android:hint="Diária"
                     app:layout_constraintEnd_toStartOf="@id/textInputLayoutAdicional"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textInputLayoutPacotes">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <AutoCompleteTextView
                         android:id="@+id/editTextDiaria"
                         style="@style/TextInputEditTextStyle"
-                        android:editable="false"
-                        android:focusable="false"
-                        android:clickable="false"
-                        android:cursorVisible="false"
-                        android:inputType="numberDecimal" />
-                        <!--android:text="R$ 0,00"-->
+                        android:inputType="none"
+                        android:clickable="true"
+                        android:cursorVisible="false" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -213,7 +210,8 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextPedagio"
                         style="@style/TextInputEditTextStyle"
-                        android:inputType="numberDecimal" />
+                        android:inputType="numberDecimal"
+                        app:prefixText="R$" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -224,12 +222,13 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/textInputLayoutPedagio"
                     app:layout_constraintTop_toTopOf="@id/textInputLayoutPedagio"
-                    android:nextFocusForward="@id/spinnerValoresCidades">
+                    android:nextFocusDown="@id/switchDomingosFeriados">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextCombustivel"
                         style="@style/TextInputEditTextStyle"
-                        android:inputType="numberDecimal" />
+                        android:inputType="numberDecimal"
+                        app:prefixText="R$" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -245,27 +244,16 @@
                     app:layout_constraintTop_toBottomOf="@id/textInputLayoutCombustivel"
                     tools:ignore="UseSwitchCompatOrMaterialXml" />
 
-                <Spinner
-                    android:id="@+id/spinnerValoresCidades"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="16dp"
-                    android:prompt="@array/valores_cidades_array"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/switchDomingosFeriados" />
-
                 <!-- Botão Adicionar Nova Rota -->
                 <Button
                     android:id="@+id/buttonAdicionarRota"
                     style="@style/ButtonStyle"
+                    android:layout_marginTop="6dp"
                     android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="16dp"
                     android:text="Adicionar Nova Rota"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/spinnerValoresCidades" />
+                    app:layout_constraintTop_toBottomOf="@+id/switchDomingosFeriados" />
             </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

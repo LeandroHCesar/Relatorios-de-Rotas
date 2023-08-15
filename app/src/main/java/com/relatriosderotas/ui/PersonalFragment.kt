@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -20,11 +19,10 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
 import com.relatriosderotas.databinding.FragmentPersonalBinding
-import com.relatriosderotas.databinding.FragmentRotasBinding
 import com.relatriosderotas.helper.KeyboardUtils
 import com.relatriosderotas.helper.UserData
 
-class PersonalDataFragment : Fragment() {
+class PersonalFragment : Fragment() {
 
     private var _binding: FragmentPersonalBinding? = null
     private val binding get() = _binding!!
