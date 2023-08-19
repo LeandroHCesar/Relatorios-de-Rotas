@@ -1,5 +1,8 @@
 package com.relatriosderotas.ui
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +30,7 @@ import com.relatriosderotas.R
 import com.relatriosderotas.adapter.DatabaseHelper
 import com.relatriosderotas.adapter.RotasAdapter
 import com.relatriosderotas.databinding.FragmentHomeBinding
+import com.relatriosderotas.databinding.FragmentRotasBinding
 import com.relatriosderotas.helper.RotaData
 import com.relatriosderotas.helper.UserInformation
 
@@ -59,9 +63,14 @@ class HomeFragment : Fragment() {
 
         when {
             _binding != null -> {
-                // Inicialize o Firebase Database
-                //val database = FirebaseDatabase.getInstance()
-                //var databaseRef = database.reference
+
+                // Verificar a conectividade à internet antes de carregar o RecyclerView
+                if (isNetworkAvailable(requireContext())) {
+                    setupRecyclerView()
+                } else {
+                    binding.recyclerView.visibility = View.GONE
+                    binding.noInternetTextView.visibility = View.VISIBLE
+                }
 
                 drawerLayout = view.findViewById(R.id.drawerLayout)
                 // Inicializar Firebase Auth
@@ -144,22 +153,55 @@ class HomeFragment : Fragment() {
                         }
                     }
                 })
-                // rotasList.sortBy { it.data }.  crescente sortedByDescending
-                recyclerView = view.findViewById(R.id.recyclerView)
-
-                DatabaseHelper.getRotasFromDatabase { rotasList ->
-                    val layoutManager = LinearLayoutManager(requireContext())
-                    recyclerView.layoutManager = layoutManager
-
-                    val sortedRotasList = rotasList.sortedBy{ it.data } // Ordena a lista pelo campo "data" decrescentemente
-
-                    val rotasAdapter = RotasAdapter(requireContext(), sortedRotasList)
-                    recyclerView.adapter = rotasAdapter
-                    rotasAdapter.notifyDataSetChanged()  // Notifica o adaptador das alterações
-
-                }
             }
         }
+    }
+
+    private fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val activeNetwork = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+
+        return networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+    }
+
+    private fun setupRecyclerView() {
+        recyclerView = requireView().findViewById(R.id.recyclerView)
+
+        DatabaseHelper.getRotasFromDatabase { rotasList ->
+            val layoutManager = LinearLayoutManager(requireContext())
+            recyclerView.layoutManager = layoutManager
+            // Ordena a lista pelo campo "data" decrescentemente sortedByDescending
+            // Ordena a lista pelo campo "data" decrescentemente sortedBy
+            val sortedRotasList = rotasList.sortedByDescending { it.data }
+
+            val rotasAdapter = RotasAdapter(requireContext(), sortedRotasList) { rota ->
+                openEditForm(rota)
+                Toast.makeText(requireContext(), "editClick", Toast.LENGTH_SHORT).show()
+            }
+            recyclerView.adapter = rotasAdapter
+            rotasAdapter.notifyDataSetChanged()  // Notifica o adaptador das alterações
+        }
+    }
+
+    private fun openEditForm(rota: RotaData) {
+        val fragmentRotas = RotasFragment()
+        val args = Bundle()
+        args.putParcelable("rota", rota)
+        args.putString("modo", "edicao")
+        fragmentRotas.arguments = args
+
+        // Abra o FragmentRotas
+        val fragmentManager = requireActivity().supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.nav_host_fragment, fragmentRotas)
+        fragmentTransaction.addToBackStack(null) // Para adicionar à pilha de fragmentos
+        fragmentTransaction.commit()
+
+        //val action = HomeFragmentDirections.actionHomeFragmentToRotasFragment()
+        //findNavController().navigate(action)
     }
 
     // Em seguida, implemente a função logoutUser() que mostra um AlertDialog de confirmação e realiza o logout:

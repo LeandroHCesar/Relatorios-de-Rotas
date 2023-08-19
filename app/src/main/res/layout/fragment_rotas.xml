@@ -26,7 +26,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView_form"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -35,30 +35,52 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="8dp">
+
             <!-- Adicione os elementos, estilos e constraints conforme necessário -->
+            <TextView
+                android:id="@+id/textDadosRota"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Adicionar Rotas"
+                android:textSize="12dp"
+                app:layout_constraintBottom_toTopOf="@+id/container_dados_rotas"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/container_dados_rotas"
                 style="@style/FormContainer"
-                android:layout_marginHorizontal="8dp">
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textDadosRota">
 
                 <!-- Linha 1: Data e ID da Rota -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/textInputLayoutData"
                     style="@style/TextInputEditText_form_small"
                     android:hint="Data"
+                    android:nextFocusLeft="@id/textInputLayoutId"
                     app:layout_constraintEnd_toStartOf="@id/textInputLayoutId"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:nextFocusLeft="@id/textInputLayoutId">
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextData"
                         style="@style/TextInputEditTextStyle"
+                        android:clickable="true"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
-                        android:clickable="true"
-                        android:onClick="showDatePickerDialog"
-                        android:inputType="none" />
+                        android:inputType="none"
+                        android:nextFocusDown="@id/editTextId"
+                        android:onClick="showDatePickerDialog" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -66,14 +88,15 @@
                     android:id="@+id/textInputLayoutId"
                     style="@style/TextInputEditText_form_small"
                     android:hint="ID da Rota"
+                    android:nextFocusDown="@id/textInputLayoutDescricaoCidades"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/textInputLayoutData"
-                    app:layout_constraintTop_toTopOf="@id/textInputLayoutData"
-                    android:nextFocusDown="@id/textInputLayoutDescricaoCidades">
+                    app:layout_constraintTop_toTopOf="@id/textInputLayoutData">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextId"
                         style="@style/TextInputEditTextStyle"
+                        android:nextFocusDown="@+id/editTextDescricaoCidades"
                         android:inputType="number" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -83,14 +106,15 @@
                     android:id="@+id/textInputLayoutDescricaoCidades"
                     style="@style/TextInputLayoutStyle"
                     android:hint="Descrição das Cidades"
+                    android:nextFocusDown="@id/textInputLayoutCodRota"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutId"
-                    android:nextFocusDown="@id/textInputLayoutCodRota">
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutId">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextDescricaoCidades"
                         style="@style/TextInputEditTextStyle"
+                        android:nextFocusDown="@+id/editTextCodRota"
                         android:inputType="textCapWords" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -100,14 +124,15 @@
                     android:id="@+id/textInputLayoutCodRota"
                     style="@style/TextInputEditText_form_small"
                     android:hint="Cod. Rota"
+                    android:nextFocusLeft="@id/textInputLayoutKm"
                     app:layout_constraintEnd_toStartOf="@id/textInputLayoutKm"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutDescricaoCidades"
-                    android:nextFocusLeft="@id/textInputLayoutKm">
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutDescricaoCidades">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextCodRota"
                         style="@style/TextInputEditTextStyle"
+                        android:nextFocusDown="@+id/editTextKm"
                         android:inputType="textCapSentences" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -116,14 +141,15 @@
                     android:id="@+id/textInputLayoutKm"
                     style="@style/TextInputEditText_form_small"
                     android:hint="Km"
+                    android:nextFocusForward="@id/textInputLayoutParadas"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/textInputLayoutCodRota"
-                    app:layout_constraintTop_toTopOf="@id/textInputLayoutCodRota"
-                    android:nextFocusForward="@id/textInputLayoutParadas">
+                    app:layout_constraintTop_toTopOf="@id/textInputLayoutCodRota">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextKm"
                         style="@style/TextInputEditTextStyle"
+                        android:nextFocusDown="@+id/editTextParadas"
                         android:inputType="numberDecimal" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -133,14 +159,15 @@
                     android:id="@+id/textInputLayoutParadas"
                     style="@style/TextInputEditText_form_small"
                     android:hint="Paradas"
+                    android:nextFocusForward="@id/textInputLayoutPacotes"
                     app:layout_constraintEnd_toStartOf="@id/textInputLayoutPacotes"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutKm"
-                    android:nextFocusForward="@id/textInputLayoutPacotes">
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutKm">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextParadas"
                         style="@style/TextInputEditTextStyle"
+                        android:nextFocusDown="@+id/editTextPacotes"
                         android:inputType="number" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -149,14 +176,15 @@
                     android:id="@+id/textInputLayoutPacotes"
                     style="@style/TextInputEditText_form_small"
                     android:hint="Pacotes"
+                    android:nextFocusForward="@id/textInputLayoutDiaria"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/textInputLayoutParadas"
-                    app:layout_constraintTop_toTopOf="@id/textInputLayoutParadas"
-                    android:nextFocusForward="@id/textInputLayoutDiaria">
+                    app:layout_constraintTop_toTopOf="@id/textInputLayoutParadas">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextPacotes"
                         style="@style/TextInputEditTextStyle"
+                        android:nextFocusDown="@+id/autoCompleteTextViewDiaria"
                         android:inputType="number" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -171,11 +199,12 @@
                     app:layout_constraintTop_toBottomOf="@id/textInputLayoutPacotes">
 
                     <AutoCompleteTextView
-                        android:id="@+id/editTextDiaria"
+                        android:id="@+id/autoCompleteTextViewDiaria"
                         style="@style/TextInputEditTextStyle"
-                        android:inputType="none"
+                        android:nextFocusDown="@+id/editTextPedagio"
                         android:clickable="true"
-                        android:cursorVisible="false" />
+                        android:cursorVisible="false"
+                        android:inputType="none" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -189,10 +218,10 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextAdicional"
                         style="@style/TextInputEditTextStyle"
-                        android:editable="false"
-                        android:focusable="false"
                         android:clickable="false"
                         android:cursorVisible="false"
+                        android:editable="false"
+                        android:focusable="false"
                         android:inputType="numberDecimal" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -202,14 +231,15 @@
                     android:id="@+id/textInputLayoutPedagio"
                     style="@style/TextInputEditText_form_small"
                     android:hint="Pedágio"
+                    android:nextFocusForward="@id/textInputLayoutCombustivel"
                     app:layout_constraintEnd_toStartOf="@id/textInputLayoutCombustivel"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutAdicional"
-                    android:nextFocusForward="@id/textInputLayoutCombustivel">
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutAdicional">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextPedagio"
                         style="@style/TextInputEditTextStyle"
+                        android:nextFocusDown="@+id/editTextCombustivel"
                         android:inputType="numberDecimal"
                         app:prefixText="R$" />
 
@@ -219,41 +249,79 @@
                     android:id="@+id/textInputLayoutCombustivel"
                     style="@style/TextInputEditText_form_small"
                     android:hint="Combustível"
+                    android:nextFocusDown="@id/switchDomingosFeriados"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/textInputLayoutPedagio"
-                    app:layout_constraintTop_toTopOf="@id/textInputLayoutPedagio"
-                    android:nextFocusDown="@id/switchDomingosFeriados">
+                    app:layout_constraintTop_toTopOf="@id/textInputLayoutPedagio">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextCombustivel"
                         style="@style/TextInputEditTextStyle"
+                        android:nextFocusDown="@+id/switchDomingosFeriados"
                         android:inputType="numberDecimal"
                         app:prefixText="R$" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Switch Domingos e Feriados style="@style/SwitchStyle"-->
-                <Switch
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switchDomingosFeriados"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="Domingos e Feriados"
+                    android:nextFocusDown="@+id/button_principal"
+                    android:text="Domingos e Feriados + 15%"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutCombustivel"
-                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+                    app:layout_constraintTop_toBottomOf="@id/textInputLayoutCombustivel" />
 
-                <!-- Botão Adicionar Nova Rota -->
                 <Button
-                    android:id="@+id/buttonAdicionarRota"
+                    android:id="@+id/button_principal"
                     style="@style/ButtonStyle"
-                    android:layout_marginTop="6dp"
+                    android:text="Calcular Rota"
+                    android:textAllCaps="false"
                     android:layout_marginHorizontal="16dp"
-                    android:text="Adicionar Nova Rota"
+                    android:layout_marginTop="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/switchDomingosFeriados" />
+
+                <LinearLayout
+                    android:id="@+id/layoutBotoesSalvarEditar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/switchDomingosFeriados">
+
+                    <Button
+                        android:id="@+id/buttonEditar"
+                        style="@style/ButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Editar"
+                        android:textAllCaps="false"/>
+
+                    <Button
+                        android:id="@+id/buttonSalvar"
+                        style="@style/ButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Salvar"
+                        android:textAllCaps="false"/>
+
+                </LinearLayout>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

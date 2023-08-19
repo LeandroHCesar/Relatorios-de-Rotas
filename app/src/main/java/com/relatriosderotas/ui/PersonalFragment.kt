@@ -179,7 +179,6 @@ class PersonalFragment : Fragment() {
         } else {
             binding.textInputLayoutNomeCompleto.error = null
         }
-
         // Campo "CPF"
         val cpf = binding.editTextCpf.text.toString()
         if (cpf.isBlank()) {
@@ -259,7 +258,6 @@ class PersonalFragment : Fragment() {
         } else {
             binding.textInputLayoutPix.error = null
         }
-
         return isValid
     }
 
@@ -294,7 +292,8 @@ class PersonalFragment : Fragment() {
             )
 
             // Crie ou atualize os dados do usuário no banco de dados
-            val userRef = databaseRef.child("meus_apps").child("relatorio_de_rotas").child("users").child(userId!!)
+            val userRef = databaseRef.child("meus_apps").child("relatorio_de_rotas")
+                .child("users").child(userId!!)
             userRef.updateChildren(userDataMap as Map<String, Any>)
                 .addOnSuccessListener {
                     // Sucesso ao salvar os dados

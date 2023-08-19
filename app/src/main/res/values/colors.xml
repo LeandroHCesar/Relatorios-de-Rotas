@@ -8,6 +8,7 @@
 
     <color name="color_secondary">#0283d0</color>
     <color name="color_destaque">#ff5722</color>
+    <color name="color_attention">#FFEB3B</color>
 
     <color name="color_text_principal">#333333</color>
     <color name="color_text_secondary">#666666</color>
