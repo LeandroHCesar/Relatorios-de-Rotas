@@ -54,7 +54,7 @@ class RotasViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(rota: RotaData) {
         val cidades = "Cidades:   ${rota.descricaoCidades}"
-        val idRota = "Id da rota: ${rota.id}"
+        val idRota = "Id da rota: ${rota.numRota}"
         val codRota = "Cod. da rota: ${rota.codRota}"
         val numParadas = "Paradas: ${rota.paradas}"
         val numPacotes = "Pacotes: ${rota.pacotes}"

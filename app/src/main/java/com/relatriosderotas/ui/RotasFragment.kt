@@ -7,7 +7,6 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +15,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -41,7 +41,7 @@ class RotasFragment : Fragment() {
     private var shouldShowDiariaDropdown = true
     private var calculatedDiariaValue: Int = 0
 
-    private var isEditMode = false
+    var isEditMode = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,83 +57,55 @@ class RotasFragment : Fragment() {
         // Certifique-se de que _binding não seja nulo antes de usá-lo
         when {
             _binding != null -> {
-
-                // Inicialize o Firebase Database
-                val database = FirebaseDatabase.getInstance()
-                val databaseRef = database.reference
-
-                // Configurar a Toolbar
-                (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
-                (activity as AppCompatActivity).supportActionBar?.apply {
-                    setDisplayHomeAsUpEnabled(true)
-                    setHomeAsUpIndicator(R.drawable.ic_back_arrow_white) // Defina o ícone personalizado aqui
-                    title = "Dados de Rota"
-                    binding.toolbar.setTitleTextAppearance(
-                        requireContext(),
-                        R.style.ToolbarTitleStyle
-                    )
-                }
-
-                // Configurar o clique na seta de voltar
-                binding.toolbar.setNavigationOnClickListener { requireActivity().onBackPressed() }
-
-                binding.editTextParadas.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        count: Int,
-                        after: Int
-                    ) {
-                    }
-
-                    override fun onTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
-                        val paradasText = s.toString().toIntOrNull()
-                        val adicionalValue = paradasText?.let { paradas ->
-                            when {
-                                paradas in 1..60 -> (paradas * 0.3 * 100).toInt()
-                                paradas in 61..90 -> ((60 * 0.3 + (paradas - 60) * 1.46) * 100).toInt()
-                                paradas > 90 -> ((60 * 0.3 + 30 * 1.46 + (paradas - 90) * 0.6) * 100).toInt()
-                                else -> 0
-                            }
-                        } ?: 0
-                        val formattedAdicionalValue = formatCurrencyValueCents(adicionalValue)
-                        binding.editTextAdicional.setText(formattedAdicionalValue)
-                    }
-
-                    override fun afterTextChanged(s: Editable?) {}
-                })
-
-                // Configurar o clique no campo de data
-                binding.editTextData.setOnClickListener { showDatePicker() }
-
-                // Filtro de edit text
-                filterEditText()
-
-                // mostrar o spinner
-                setupDiariaField()
-
-                validaçãoInstantânea()
-
-                setupEditMode()
-
-                clicks()
+                setupUI()
             }
         }
     }
 
-    private fun clicks() {
+    private fun setupUI() {
+        configureToolbar()
+        configureBackButton()
+        buttonsClicks()
+        filterEditText()
+        setupDiariaField()
+        validaçãoInstantânea()
+        //setupEditMode()
+        setupEditButtonDate()
+        setupCalculateButtonClicks()
+    }
+
+    private fun configureToolbar() {
+        // Configurar a Toolbar
+        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setHomeAsUpIndicator(R.drawable.ic_back_arrow_white) // Defina o ícone personalizado aqui
+            title = "Dados de Rota"
+            binding.toolbar.setTitleTextAppearance(requireContext(), R.style.ToolbarTitleStyle)
+        }
+    }  // ok
+
+    private fun configureBackButton() {
+        // Configurar o clique na seta de voltar
+        binding.toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressed()
+        }
+    }  // ok
+
+    /*private fun navigateToHome() {
+        val action = RotasFragmentDirections.actionRotasFragmentToHomeFragment()
+        findNavController().navigate(action)
+    }*/
+
+    private fun buttonsClicks() {
         if (isEditMode) {
             // Evento de clique no botão "Atualizar Rota":
             binding.buttonPrincipal.setOnClickListener {
                 if (isFormValid()) {
                     val diaria = calcularDiaria()
                     setFormFieldsEnabled(false)
-                    // Aqui você pode personalizar o texto do botão
+
+                    // Personalize a aparência do botão
                     binding.buttonPrincipal.text = "Atualizar Rota"
                     binding.buttonPrincipal.setBackgroundColor(
                         ContextCompat.getColor(
@@ -147,10 +119,14 @@ class RotasFragment : Fragment() {
                             R.color.white
                         )
                     )
-                    // Aqui você pode adicionar a lógica para atualizar a rota no banco de dados
                 }
+                //navigateToHome()
+                //updateRota(rota)
+                Toast.makeText(requireContext(), "Rota atualizada com sucesso", Toast.LENGTH_SHORT).show()
+                Log.d("buttonsClicks", "buttonsClicks: quebrou o app")
             }
-        } else {
+        }
+        else {
             // Evento de clique no botão "Calcular Rota":
             binding.buttonPrincipal.setOnClickListener {
                 if (isFormValid()) {
@@ -201,40 +177,47 @@ class RotasFragment : Fragment() {
                 binding.layoutBotoesSalvarEditar.visibility = View.VISIBLE
             }
         }
-    }
+    } // ok
 
-    private fun setupEditMode() {
-        val arguments = arguments
-        if (arguments != null) {
-            val rota: RotaData? = arguments.getParcelable("rota")
-            if (rota != null) {
-                isEditMode = true // Defina o modo de edição como verdadeiro
-                binding.editTextData.setText(rota.data)
-                binding.editTextId.setText(rota.id)
-                binding.editTextDescricaoCidades.setText(rota.descricaoCidades)
-                binding.editTextCodRota.setText(rota.codRota)
-                binding.editTextKm.setText(rota.km)
-                binding.editTextParadas.setText(rota.paradas)
-                binding.editTextPacotes.setText(rota.pacotes)
-                binding.editTextAdicional.setText(rota.adicionalCentavos.toString())
-                binding.editTextPedagio.setText(rota.pedagioCentavos.toString())
-                binding.editTextCombustivel.setText(rota.combustivelCentavos.toString())
+    private fun setupEditButtonDate() {
+        // Configurar o clique no campo de data
+        binding.editTextData.setOnClickListener { showDatePicker() }
+    }  // ok
 
-                binding.buttonPrincipal.setBackgroundColor(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.color_attention
-                    )
-                )
-                binding.buttonPrincipal.setTextColor(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.black
-                    )
-                )
+    private fun setupCalculateButtonClicks() {
+        // Configurar eventos de clique para o modo de cálculo...
+        binding.editTextParadas.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
             }
-        }
-    }
+
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+                val paradasText = s.toString().toIntOrNull()
+                val adicionalValue = paradasText?.let { paradas ->
+                    when {
+                        paradas in 1..60 -> (paradas * 0.3 * 100).toInt()
+                        paradas in 61..90 -> ((60 * 0.3 + (paradas - 60) * 1.46) * 100).toInt()
+                        paradas > 90 -> ((60 * 0.3 + 30 * 1.46 + (paradas - 90) * 0.6) * 100).toInt()
+                        else -> 0
+                    }
+                } ?: 0
+                val formattedAdicionalValue = formatCurrencyValueCents(adicionalValue)
+                binding.editTextAdicional.setText(formattedAdicionalValue)
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+    }  // ok
 
     private fun setupInstantValidationForAutoCompleteField(
         autoCompleteTextView: AutoCompleteTextView,
@@ -264,26 +247,6 @@ class RotasFragment : Fragment() {
         })
     }
 
-    private fun formatCurrencyValueCents(valueCents: Int): String {
-        val valueInReal = valueCents / 100.0
-        return formatCurrency(valueInReal)
-    }
-
-    private fun convertCurrencyToCents(currency: String): Int {
-        val cleanedCurrency = currency.replace("R$", "").replace(",", ".").trim()
-        val valueInCents = (cleanedCurrency.toDouble() * 100).toInt()
-        return valueInCents
-    }
-
-    private fun formatCurrencyField(input: String): String {
-        val value = input.replace("R$", "").replace(",", "").toDoubleOrNull() ?: 0.0
-        return formatCurrency(value)
-    }
-
-    private fun formatCurrency(value: Double): String {
-        return String.format("R$ %.2f", value)
-    }
-
     private fun saveRotaDataToDatabase() {
         val rotaData = createRotaData() // Crie o objeto RotaData com os dados
 
@@ -296,40 +259,207 @@ class RotasFragment : Fragment() {
             val databaseRef = FirebaseDatabase.getInstance().reference
 
             // Crie um nó "rotas" no banco de dados com o UID do usuário como parte da estrutura
-            val rotasRef = databaseRef.child("meus_apps").child("relatorio_de_rotas")
-                .child("users").child(userId).child("rotas")
+            val rotasRef = databaseRef
+                .child("meus_apps")
+                .child("relatorio_de_rotas")
+                .child("rotas")
+                .child(userId)
 
-            // Crie uma nova chave única para a rota
+            // Use push() para criar uma nova chave única automaticamente e obter a referência
             val newRotaRef = rotasRef.push()
-
+            val newRotaId = newRotaRef.key // Obtém o ID gerado automaticamente
+            rotaData.idRota = newRotaId ?: ""
             // Salve os dados usando a chave única
             newRotaRef.setValue(rotaData)
                 .addOnSuccessListener {
                     // Sucesso ao salvar os dados da rota
+
                     displayMessage("Dados da rota foram salvos com sucesso.")
                 }
                 .addOnFailureListener { exception ->
                     // Falha ao salvar os dados da rota
                     displayMessageError("Erro ao salvar os dados da rota: ${exception.message}")
-
                 }
         }
     }
 
-    private fun displayMessage(message: String) {
-        val context = requireContext()
-        val duration = Toast.LENGTH_SHORT
-        val toast = Toast.makeText(context, message, duration)
-        toast.show()
-    }
+    /*private fun setupEditMode() {
+        val arguments = arguments
+        if (arguments != null) {
+            val rota: RotaData? = arguments.getParcelable("rota")
+            if (rota != null) {
 
-    private fun displayMessageError(error: String) {
-        // Exibir a mensagem de erro na interface do usuário, por exemplo:
-        val context = requireContext()
-        val duration = Toast.LENGTH_SHORT
-        val toast = Toast.makeText(context, "Error: $error", duration)
-        toast.show()
-    }
+                binding.editTextData.setText(rota.data)
+                binding.editTextId.setText(rota.numRota)
+                binding.editTextDescricaoCidades.setText(rota.descricaoCidades)
+                binding.editTextCodRota.setText(rota.codRota)
+                binding.editTextKm.setText(rota.km)
+                binding.editTextParadas.setText(rota.paradas)
+                binding.editTextPacotes.setText(rota.pacotes)
+                //binding.autoCompleteTextViewDiaria.setText(formatCurrency(rota.adicionalCentavos / 100.0))
+                binding.editTextAdicional.setText(formatCurrency(rota.adicionalCentavos / 100.0))
+                binding.editTextPedagio.setText(formatCurrency(rota.pedagioCentavos / 100.0))
+                binding.editTextCombustivel.setText(formatCurrency(rota.combustivelCentavos / 100.0))
+
+                binding.buttonPrincipal.setBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.color_attention
+                    )
+                )
+
+                binding.buttonPrincipal.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.black
+                    )
+                )
+            }
+        }
+    }*/
+
+    /*private fun updateRota(rota: RotaData) {
+        // Atualize os campos da rota com os novos valores dos campos de edição
+        rota.data = binding.editTextData.text.toString().trim()
+        rota.descricaoCidades = binding.editTextDescricaoCidades.text.toString().trim()
+        rota.codRota = binding.editTextCodRota.text.toString().trim()
+        rota.km = binding.editTextKm.text.toString().trim()
+        rota.paradas = binding.editTextParadas.text.toString().trim()
+        rota.pacotes = binding.editTextPacotes.text.toString().trim()
+        rota.adicionalCentavos = convertCurrencyToCents(binding.editTextAdicional.text.toString().trim())
+        rota.pedagioCentavos = convertCurrencyToCents(binding.editTextPedagio.text.toString().trim())
+        rota.combustivelCentavos = convertCurrencyToCents(binding.editTextCombustivel.text.toString().trim())
+
+        // Atualize a rota no Firebase usando o ID da rota
+        val databaseRef = FirebaseDatabase.getInstance().reference
+        val currentUser = Firebase.auth.currentUser
+        val userId = currentUser?.uid
+
+        if (userId != null) {
+            val rotaRef = databaseRef
+                .child("meus_apps")
+                .child("relatorio_de_rotas")
+                .child("rotas")
+                .child(userId)
+                .child(rota.idRota) // Use o número da rota para acessar o nó correto
+
+            rotaRef.setValue(rota)
+                .addOnSuccessListener {
+                    // Sucesso ao atualizar a rota
+                    displayMessage("Rota atualizada com sucesso.")
+                }
+                .addOnFailureListener { exception ->
+                    // Falha ao atualizar a rota
+                    displayMessageError("Erro ao atualizar a rota: ${exception.message}")
+                }
+        }
+    }*/
+
+    private fun filterEditText() {
+        val editTextId = binding.editTextId
+        editTextId.filters = arrayOf(MaxLengthInputFilter(9)) // Limite de 9 caracteres
+
+        val editTextDescricaoCidades = binding.editTextDescricaoCidades
+        editTextDescricaoCidades.filters =
+            arrayOf(MaxLengthInputFilter(3 * 20)) // Limite de 3 cidades com até 20 caracteres cada
+
+        val editTextCodRota = binding.editTextCodRota
+        editTextCodRota.filters = arrayOf(MaxLengthInputFilter(4)) // Limite de 5 caracteres
+
+        val editTextKm = binding.editTextKm
+        editTextKm.filters = arrayOf(MaxLengthInputFilter(3)) // Limite de 6 caracteres
+
+        val editTextParadas = binding.editTextParadas
+        editTextParadas.filters = arrayOf(MaxLengthInputFilter(3)) // Limite de 3 caracteres
+
+        val editTextPacotes = binding.editTextPacotes
+        editTextPacotes.filters = arrayOf(MaxLengthInputFilter(3)) // Limite de 3 caracteres
+
+        val editTextPedagio = binding.editTextPedagio
+        editTextPedagio.filters = arrayOf(MaxLengthInputFilter(8)) // Limite de 8 caracteres
+
+        val editTextCombustivel = binding.editTextCombustivel
+        editTextCombustivel.filters = arrayOf(MaxLengthInputFilter(9)) // Limite de 9 caracteres
+    }  // ok
+
+    private fun validaçãoInstantânea() {
+        // Chamando a função para configurar validação instantânea para cada campo relevante
+        setupInstantValidationForField(binding.editTextData, binding.textInputLayoutData)
+        setupInstantValidationForField(binding.editTextId, binding.textInputLayoutId)
+        setupInstantValidationForField(
+            binding.editTextDescricaoCidades,
+            binding.textInputLayoutDescricaoCidades
+        )
+        setupInstantValidationForField(
+            binding.editTextCodRota,
+            binding.textInputLayoutCodRota
+        )
+        setupInstantValidationForField(binding.editTextKm, binding.textInputLayoutKm)
+        setupInstantValidationForField(
+            binding.editTextParadas,
+            binding.textInputLayoutParadas
+        )
+        setupInstantValidationForField(
+            binding.editTextPacotes,
+            binding.textInputLayoutPacotes
+        )
+        setupInstantValidationForAutoCompleteField(
+            binding.autoCompleteTextViewDiaria,
+            binding.textInputLayoutDiaria
+        )
+        setupInstantValidationForField(
+            binding.editTextPedagio,
+            binding.textInputLayoutPedagio
+        )
+        setupInstantValidationForField(
+            binding.editTextCombustivel,
+            binding.textInputLayoutCombustivel
+        )
+    }  // ok
+
+    private fun setupDiariaField() {
+        val cidadesArray = resources.getStringArray(R.array.valores_cidades_array)
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            cidadesArray
+        )
+        val autoCompleteTextView = binding.autoCompleteTextViewDiaria
+        autoCompleteTextView.setAdapter(adapter)
+
+        autoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
+            val selectedDiaria = cidadesArray[position]
+            autoCompleteTextView.setText(selectedDiaria)
+            autoCompleteTextView.clearFocus() // Para fechar o dropdown após a seleção
+        }
+
+        // Lidar com o clique no campo
+        autoCompleteTextView.setOnClickListener {
+            if (shouldShowDiariaDropdown) {
+                autoCompleteTextView.showDropDown()
+            }
+        }
+    } // ok
+
+    private fun formatCurrencyValueCents(valueCents: Int): String {
+        val valueInReal = valueCents / 100.0
+        return formatCurrency(valueInReal)
+    }  // ok
+
+    private fun convertCurrencyToCents(currency: String): Int {
+        val cleanedCurrency = currency.replace("R$", "").replace(",", ".").trim()
+        val valueInCents = (cleanedCurrency.toDouble() * 100).toInt()
+        return valueInCents
+    }  // ok
+
+    private fun formatCurrencyField(input: String): String {
+        val value = input.replace("R$", "").replace(",", "").toDoubleOrNull() ?: 0.0
+        return formatCurrency(value)
+    }  // ok
+
+    private fun formatCurrency(value: Double): String {
+        return String.format("R$ %.2f", value)
+    } // ok
 
     private fun isFormValid(): Boolean {
         var isValid = true
@@ -405,7 +535,7 @@ class RotasFragment : Fragment() {
         }
 
         return isValid
-    }
+    } // ok
 
     private fun calcularDiaria(): Int {
         // Formate os campos de pedágio e combustível
@@ -440,7 +570,7 @@ class RotasFragment : Fragment() {
         calculatedDiariaValue = 0 // Zera o valor calculado
 
         return 0
-    }
+    } // ok
 
     private fun setFormFieldsEnabled(enabled: Boolean) {
         // Define a propriedade isEnabled dos campos de edição através do binding
@@ -509,10 +639,10 @@ class RotasFragment : Fragment() {
             )
         )
 
-    }
+    } //ok
 
     private fun createRotaData(): RotaData {
-        val id = binding.editTextId.text.toString().trim()
+        val numRota = binding.editTextId.text.toString().trim()
         val descricaoCidades = binding.editTextDescricaoCidades.text.toString().trim()
         val codRota = binding.editTextCodRota.text.toString().trim()
         val km = binding.editTextKm.text.toString().trim()
@@ -560,7 +690,8 @@ class RotasFragment : Fragment() {
         }
 
         return RotaData(
-            id = id,
+            //idRota = "",
+            numRota = numRota,
             diaDaSemana = diaDaSemana,
             descricaoCidades = descricaoCidades,
             codRota = codRota,
@@ -573,12 +704,10 @@ class RotasFragment : Fragment() {
             data = data,
             adicionalCentavos = adicionalCentavos
         )
-    }
+    } // ok
 
     private fun resetButtonAndFields() {
-
         setFormFieldsEnabled(true)
-
         // Limpa os campos
         binding.editTextData.text = null
         binding.editTextDescricaoCidades.text = null
@@ -605,58 +734,22 @@ class RotasFragment : Fragment() {
         binding.textInputLayoutDiaria.error = null
         binding.editTextAdicional.error = null
 
-    }
+    }  // ok
 
-    private fun filterEditText() {
-        val editTextId = binding.editTextId
-        editTextId.filters = arrayOf(MaxLengthInputFilter(9)) // Limite de 9 caracteres
+    private fun displayMessage(message: String) {
+        val context = requireContext()
+        val duration = Toast.LENGTH_SHORT
+        val toast = Toast.makeText(context, message, duration)
+        toast.show()
+    } // ok
 
-        val editTextDescricaoCidades = binding.editTextDescricaoCidades
-        editTextDescricaoCidades.filters =
-            arrayOf(MaxLengthInputFilter(3 * 20)) // Limite de 3 cidades com até 20 caracteres cada
-
-        val editTextCodRota = binding.editTextCodRota
-        editTextCodRota.filters = arrayOf(MaxLengthInputFilter(4)) // Limite de 5 caracteres
-
-        val editTextKm = binding.editTextKm
-        editTextKm.filters = arrayOf(MaxLengthInputFilter(3)) // Limite de 6 caracteres
-
-        val editTextParadas = binding.editTextParadas
-        editTextParadas.filters = arrayOf(MaxLengthInputFilter(3)) // Limite de 3 caracteres
-
-        val editTextPacotes = binding.editTextPacotes
-        editTextPacotes.filters = arrayOf(MaxLengthInputFilter(3)) // Limite de 3 caracteres
-
-        val editTextPedagio = binding.editTextPedagio
-        editTextPedagio.filters = arrayOf(MaxLengthInputFilter(8)) // Limite de 8 caracteres
-
-        val editTextCombustivel = binding.editTextCombustivel
-        editTextCombustivel.filters = arrayOf(MaxLengthInputFilter(9)) // Limite de 9 caracteres
-    }
-
-    private fun setupDiariaField() {
-        val cidadesArray = resources.getStringArray(R.array.valores_cidades_array)
-        val adapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_dropdown_item_1line,
-            cidadesArray
-        )
-        val autoCompleteTextView = binding.autoCompleteTextViewDiaria
-        autoCompleteTextView.setAdapter(adapter)
-
-        autoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
-            val selectedDiaria = cidadesArray[position]
-            autoCompleteTextView.setText(selectedDiaria)
-            autoCompleteTextView.clearFocus() // Para fechar o dropdown após a seleção
-        }
-
-        // Lidar com o clique no campo
-        autoCompleteTextView.setOnClickListener {
-            if (shouldShowDiariaDropdown) {
-                autoCompleteTextView.showDropDown()
-            }
-        }
-    }
+    private fun displayMessageError(error: String) {
+        // Exibir a mensagem de erro na interface do usuário, por exemplo:
+        val context = requireContext()
+        val duration = Toast.LENGTH_SHORT
+        val toast = Toast.makeText(context, "Error: $error", duration)
+        toast.show()
+    }  //ok
 
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
@@ -674,45 +767,10 @@ class RotasFragment : Fragment() {
             year, month, day
         )
         datePickerDialog.show()
-    }
-
-    private fun validaçãoInstantânea() {
-        // Chamando a função para configurar validação instantânea para cada campo relevante
-        setupInstantValidationForField(binding.editTextData, binding.textInputLayoutData)
-        setupInstantValidationForField(binding.editTextId, binding.textInputLayoutId)
-        setupInstantValidationForField(
-            binding.editTextDescricaoCidades,
-            binding.textInputLayoutDescricaoCidades
-        )
-        setupInstantValidationForField(
-            binding.editTextCodRota,
-            binding.textInputLayoutCodRota
-        )
-        setupInstantValidationForField(binding.editTextKm, binding.textInputLayoutKm)
-        setupInstantValidationForField(
-            binding.editTextParadas,
-            binding.textInputLayoutParadas
-        )
-        setupInstantValidationForField(
-            binding.editTextPacotes,
-            binding.textInputLayoutPacotes
-        )
-        setupInstantValidationForAutoCompleteField(
-            binding.autoCompleteTextViewDiaria,
-            binding.textInputLayoutDiaria
-        )
-        setupInstantValidationForField(
-            binding.editTextPedagio,
-            binding.textInputLayoutPedagio
-        )
-        setupInstantValidationForField(
-            binding.editTextCombustivel,
-            binding.textInputLayoutCombustivel
-        )
-    }
+    }  // ok
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
+    } // ok
 }

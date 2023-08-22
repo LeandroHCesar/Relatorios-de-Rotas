@@ -72,8 +72,11 @@ class PersonalFragment : Fragment() {
                     userId = currentUser.uid
                     // Obtenha o ID do usuário autenticado
                     userId?.let { uid ->
-                        // Obtenha a referência para o nó "users" no banco de dados para o usuário atual
-                        val userRef = databaseRef.child("meus_apps").child("relatorio_de_rotas").child("users").child(uid)
+                        // Obtenha a referência para o nó "userDetails" no banco de dados para o usuário atual
+                        val userRef = databaseRef
+                            .child("meus_apps")
+                            .child("relatorio_de_rotas")
+                            .child(userId!!)
 
                         // Adicione um listener para ouvir as alterações nos dados do usuário
                         userRef.addValueEventListener(object : ValueEventListener {
@@ -292,8 +295,12 @@ class PersonalFragment : Fragment() {
             )
 
             // Crie ou atualize os dados do usuário no banco de dados
-            val userRef = databaseRef.child("meus_apps").child("relatorio_de_rotas")
-                .child("users").child(userId!!)
+            val userRef = databaseRef
+                .child("meus_apps")
+                .child("relatorio_de_rotas")
+                .child("userDetails")
+                .child(userId!!)
+
             userRef.updateChildren(userDataMap as Map<String, Any>)
                 .addOnSuccessListener {
                     // Sucesso ao salvar os dados

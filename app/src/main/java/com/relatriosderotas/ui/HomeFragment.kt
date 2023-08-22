@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,12 +28,11 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
-import com.relatriosderotas.adapter.DatabaseHelper
+import com.relatriosderotas.helper.DatabaseHelper
 import com.relatriosderotas.adapter.RotasAdapter
 import com.relatriosderotas.databinding.FragmentHomeBinding
-import com.relatriosderotas.databinding.FragmentRotasBinding
 import com.relatriosderotas.helper.RotaData
-import com.relatriosderotas.helper.UserInformation
+import com.relatriosderotas.helper.UserDetails
 
 class HomeFragment : Fragment() {
 
@@ -44,11 +44,7 @@ class HomeFragment : Fragment() {
     private lateinit var userRef: DatabaseReference
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
-
     private lateinit var recyclerView: RecyclerView
-    private lateinit var rotasAdapter: RotasAdapter
-
-    //private var databaseRef: DatabaseReference? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,97 +60,111 @@ class HomeFragment : Fragment() {
         when {
             _binding != null -> {
 
-                // Verificar a conectividade à internet antes de carregar o RecyclerView
-                if (isNetworkAvailable(requireContext())) {
-                    setupRecyclerView()
-                } else {
-                    binding.recyclerView.visibility = View.GONE
-                    binding.noInternetTextView.visibility = View.VISIBLE
-                }
-
-                drawerLayout = view.findViewById(R.id.drawerLayout)
                 // Inicializar Firebase Auth
                 auth = Firebase.auth
                 val userId = auth.currentUser?.uid
                 if (userId != null) {
                     // Referência para o banco de dados "users" no Firebase Realtime Database
                     userRef =
-                        databaseRef.child("meus_apps").child("relatorio_de_rotas").child("users")
-                            .child(userId!!)
-                }
-                // Configurar a Toolbar
-                (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
-                (activity as AppCompatActivity).supportActionBar?.apply {
-                    setDisplayHomeAsUpEnabled(true)
-                    setHomeAsUpIndicator(R.drawable.ic_drawer_menu) // Substitua pelo ícone do Drawer desejado
-                    title = "Home"
-                    binding.toolbar.setTitleTextAppearance(
-                        requireContext(),
-                        R.style.ToolbarTitleStyle
-                    )
+                        databaseRef.child("meus_apps").child("relatorio_de_rotas").child("userDetails")
+                            .child(userId)
                 }
 
-                // Configurar o clique no ícone do Drawer
-                binding.toolbar.setNavigationOnClickListener {
-                    drawerLayout.openDrawer(GravityCompat.START)
-                }
-
-                // Referência para o NavigationView
-                navigationView = binding.navigationView // Já deve estar inicializado
-
-                // Configurar o clique nos itens do Drawer
-                navigationView.setNavigationItemSelectedListener { menuItem ->
-                    when (menuItem.itemId) {
-                        R.id.nav_logout -> {
-                            logoutUser()
-                            drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
-                            true // Indicar que o clique foi tratado com sucesso
-                        }
-
-                        R.id.nav_datas -> {
-                            findNavController().navigate(R.id.action_homeFragment_to_personalDataFragment)
-                            drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
-                            true // Indicar que o clique foi tratado com sucesso
-                        }
-
-                        R.id.nav_rota -> {
-                            findNavController().navigate(R.id.action_homeFragment_to_rotasFragment)
-                            drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
-                            true // Indicar que o clique foi tratado com sucesso
-                        }
-                        // Outros itens do menu aqui, se houver
-                        else -> false // Indicar que o clique não foi tratado
-                    }
-                }
-
-                userRef.addValueEventListener(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (_binding != null && isAdded) { // Verifique se o fragmento está vinculado à atividade
-                            val user = snapshot.getValue(UserInformation::class.java)
-                            if (user != null) {
-                                val userName = user.userName
-                                val userEmail = user.email
-                                // Atualizar o texto nas TextViews no nav_header_main
-                                val headerView = binding.navigationView.getHeaderView(0)
-                                headerView.findViewById<TextView>(R.id.textViewNome).text = userName
-                                headerView.findViewById<TextView>(R.id.textViewEmail).text =
-                                    userEmail
-                            }
-                        }
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        if (isAdded) { // Verifique se o fragmento está vinculado à atividade
-                            Toast.makeText(
-                                requireContext(),
-                                "Erro ao recuperar os dados do usuário.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                })
+                initToolbarAndNavigation()
+                initUserRef()
+                testingNetwork()
             }
         }
+    }
+
+    private fun testingNetwork() {
+        // Verificar a conectividade à internet antes de carregar o RecyclerView
+        if (isNetworkAvailable(requireContext())) {
+            setupRecyclerView()
+        } else {
+            binding.recyclerView.visibility = View.GONE
+            binding.noInternetTextView.visibility = View.VISIBLE
+        }
+
+    }
+
+    private fun initToolbarAndNavigation() {
+        drawerLayout = requireView().findViewById(R.id.drawerLayout)
+        // Configurar a Toolbar
+        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setHomeAsUpIndicator(R.drawable.ic_drawer_menu) // Substitua pelo ícone do Drawer desejado
+            title = "Home"
+            binding.toolbar.setTitleTextAppearance(
+                requireContext(),
+                R.style.ToolbarTitleStyle
+            )
+        }
+
+        // Configurar o clique no ícone do Drawer
+        binding.toolbar.setNavigationOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+
+        // Referência para o NavigationView
+        navigationView = binding.navigationView // Já deve estar inicializado
+
+        // Configurar o clique nos itens do Drawer
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_logout -> {
+                    logoutUser()
+                    drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
+                    true // Indicar que o clique foi tratado com sucesso
+                }
+
+                R.id.nav_datas -> {
+                    findNavController().navigate(R.id.action_homeFragment_to_personalDataFragment)
+                    drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
+                    true // Indicar que o clique foi tratado com sucesso
+                }
+
+                R.id.nav_rota -> {
+                    findNavController().navigate(R.id.action_homeFragment_to_rotasFragment)
+                    drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
+                    true // Indicar que o clique foi tratado com sucesso
+                }
+                // Outros itens do menu aqui, se houver
+                else -> false // Indicar que o clique não foi tratado
+            }
+        }
+
+    }
+
+    private fun initUserRef() {
+        userRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (_binding != null && isAdded) { // Verifique se o fragmento está vinculado à atividade
+                    val user = snapshot.getValue(UserDetails::class.java)
+                    if (user != null) {
+                        val userName = user.userName
+                        val userEmail = user.email
+                        Log.d("UserDetails", "User Name: $userName")
+                        Log.d("UserDetails", "User Email: $userEmail")
+                        // Atualizar o texto nas TextViews no nav_header_main
+                        val headerView = binding.navigationView.getHeaderView(0)
+                        headerView.findViewById<TextView>(R.id.textViewNome).text = userName
+                        headerView.findViewById<TextView>(R.id.textViewEmail).text = userEmail
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                if (isAdded) { // Verifique se o fragmento está vinculado à atividade
+                    Toast.makeText(
+                        requireContext(),
+                        "Erro ao recuperar os dados do usuário.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        })
     }
 
     private fun isNetworkAvailable(context: Context): Boolean {
@@ -179,10 +189,9 @@ class HomeFragment : Fragment() {
 
             val rotasAdapter = RotasAdapter(requireContext(), sortedRotasList) { rota ->
                 openEditForm(rota)
-                Toast.makeText(requireContext(), "editClick", Toast.LENGTH_SHORT).show()
             }
             recyclerView.adapter = rotasAdapter
-            rotasAdapter.notifyDataSetChanged()  // Notifica o adaptador das alterações
+            //rotasAdapter.notifyDataSetChanged()  // Notifica o adaptador das alterações
         }
     }
 
@@ -190,8 +199,8 @@ class HomeFragment : Fragment() {
         val fragmentRotas = RotasFragment()
         val args = Bundle()
         args.putParcelable("rota", rota)
-        args.putString("modo", "edicao")
         fragmentRotas.arguments = args
+        fragmentRotas.isEditMode = true
 
         // Abra o FragmentRotas
         val fragmentManager = requireActivity().supportFragmentManager
@@ -200,8 +209,6 @@ class HomeFragment : Fragment() {
         fragmentTransaction.addToBackStack(null) // Para adicionar à pilha de fragmentos
         fragmentTransaction.commit()
 
-        //val action = HomeFragmentDirections.actionHomeFragmentToRotasFragment()
-        //findNavController().navigate(action)
     }
 
     // Em seguida, implemente a função logoutUser() que mostra um AlertDialog de confirmação e realiza o logout:
