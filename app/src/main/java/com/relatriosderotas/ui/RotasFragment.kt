@@ -58,6 +58,15 @@ class RotasFragment : Fragment() {
         when {
             _binding != null -> {
                 setupUI()
+                // Verifique se há argumentos passados ao fragmento
+                val arguments = arguments
+                if (arguments != null) {
+                    val rota: RotaData? = arguments.getParcelable("rota")
+                    if (rota != null) {
+                        // Configure o formulário no modo de edição com os dados da rota
+                        setupEditMode(rota)
+                    }
+                }
             }
         }
     }
@@ -67,8 +76,8 @@ class RotasFragment : Fragment() {
         configureBackButton()
         buttonsClicks()
         filterEditText()
-        setupDiariaField()
-        validaçãoInstantânea()
+        setupDiaryField()
+        validatorInstantaneous()
         //setupEditMode()
         setupEditButtonDate()
         setupCalculateButtonClicks()
@@ -92,21 +101,23 @@ class RotasFragment : Fragment() {
         }
     }  // ok
 
-    /*private fun navigateToHome() {
-        val action = RotasFragmentDirections.actionRotasFragmentToHomeFragment()
-        findNavController().navigate(action)
-    }*/
+    private fun performCalculation() {
+
+    }
 
     private fun buttonsClicks() {
+        val rota = arguments?.getParcelable<RotaData>("rota")
+        val position = arguments?.getInt("position", -1) // Valor padrão -1
         if (isEditMode) {
+            // Evento de clique no botão "Atualizar Rota":
             // Evento de clique no botão "Atualizar Rota":
             binding.buttonPrincipal.setOnClickListener {
                 if (isFormValid()) {
-                    val diaria = calcularDiaria()
-                    setFormFieldsEnabled(false)
+                    // Realizar o cálculo e obter o valor da diária
+                    val diaria = calculatorDiary()
 
-                    // Personalize a aparência do botão
-                    binding.buttonPrincipal.text = "Atualizar Rota"
+                    // Personalize a aparência do botão para indicar que o cálculo foi feito
+                    binding.buttonPrincipal.text = "Atualizar no Servidor?"
                     binding.buttonPrincipal.setBackgroundColor(
                         ContextCompat.getColor(
                             requireContext(),
@@ -119,18 +130,23 @@ class RotasFragment : Fragment() {
                             R.color.white
                         )
                     )
+
+                    // Agora, aguarde o segundo clique para atualizar a rota
+                    binding.buttonPrincipal.setOnClickListener {
+                        // Atualize a rota com os novos valores dos campos de edição
+                        if ((position != null) && (rota != null)) {
+                            updateRota(position, rota)
+                        }
+                        binding.buttonPrincipal.text = "Atualizado"
+                    }
+
                 }
-                //navigateToHome()
-                //updateRota(rota)
-                Toast.makeText(requireContext(), "Rota atualizada com sucesso", Toast.LENGTH_SHORT).show()
-                Log.d("buttonsClicks", "buttonsClicks: quebrou o app")
             }
-        }
-        else {
+        } else {
             // Evento de clique no botão "Calcular Rota":
             binding.buttonPrincipal.setOnClickListener {
                 if (isFormValid()) {
-                    val diaria = calcularDiaria()
+                    val diaria = calculatorDiary()
                     setFormFieldsEnabled(false)
                     // Mostrar o layout de edição e esconde o botão "Calcular Rota"
                     binding.buttonPrincipal.visibility = View.GONE
@@ -283,12 +299,12 @@ class RotasFragment : Fragment() {
         }
     }
 
-    /*private fun setupEditMode() {
+    private fun setupEditMode(rota: RotaData) {
         val arguments = arguments
         if (arguments != null) {
             val rota: RotaData? = arguments.getParcelable("rota")
             if (rota != null) {
-
+                Log.d("Debug", "Rota data received: $rota")
                 binding.editTextData.setText(rota.data)
                 binding.editTextId.setText(rota.numRota)
                 binding.editTextDescricaoCidades.setText(rota.descricaoCidades)
@@ -316,19 +332,27 @@ class RotasFragment : Fragment() {
                 )
             }
         }
-    }*/
+    }
 
-    /*private fun updateRota(rota: RotaData) {
+    private fun updateRota(position: Int, rota: RotaData) {
         // Atualize os campos da rota com os novos valores dos campos de edição
-        rota.data = binding.editTextData.text.toString().trim()
         rota.descricaoCidades = binding.editTextDescricaoCidades.text.toString().trim()
         rota.codRota = binding.editTextCodRota.text.toString().trim()
         rota.km = binding.editTextKm.text.toString().trim()
         rota.paradas = binding.editTextParadas.text.toString().trim()
         rota.pacotes = binding.editTextPacotes.text.toString().trim()
-        rota.adicionalCentavos = convertCurrencyToCents(binding.editTextAdicional.text.toString().trim())
-        rota.pedagioCentavos = convertCurrencyToCents(binding.editTextPedagio.text.toString().trim())
-        rota.combustivelCentavos = convertCurrencyToCents(binding.editTextCombustivel.text.toString().trim())
+        rota.adicionalCentavos =
+            convertCurrencyToCents(binding.editTextAdicional.text.toString().trim())
+        rota.diariaCentavos =
+            convertCurrencyToCents(binding.autoCompleteTextViewDiaria.text.toString().trim())
+        rota.pedagioCentavos =
+            convertCurrencyToCents(binding.editTextPedagio.text.toString().trim())
+        rota.combustivelCentavos =
+            convertCurrencyToCents(binding.editTextCombustivel.text.toString().trim())
+        val novaData = binding.editTextData.text.toString().trim()
+        rota.data = novaData
+        val novoDiaDaSemana = calculateDayOfWeek(novaData)
+        rota.diaDaSemana = novoDiaDaSemana
 
         // Atualize a rota no Firebase usando o ID da rota
         val databaseRef = FirebaseDatabase.getInstance().reference
@@ -346,14 +370,25 @@ class RotasFragment : Fragment() {
             rotaRef.setValue(rota)
                 .addOnSuccessListener {
                     // Sucesso ao atualizar a rota
+                    // No callback de sucesso da atualização
+                    binding.buttonPrincipal.isEnabled = true // Habilitar o botão novamente
+                    // Voltar à tela inicial
                     displayMessage("Rota atualizada com sucesso.")
+                    // Voltar à tela inicial
+                    val fragmentManager = requireActivity().supportFragmentManager
+                    fragmentManager.popBackStack() // Voltar ao fragment anterior
                 }
                 .addOnFailureListener { exception ->
                     // Falha ao atualizar a rota
+                    // No callback de falha da atualização
+                    binding.buttonPrincipal.isEnabled = true // Habilitar o botão novamente
                     displayMessageError("Erro ao atualizar a rota: ${exception.message}")
+                    // Voltar à tela inicial
+                    val fragmentManager = requireActivity().supportFragmentManager
+                    fragmentManager.popBackStack() // Voltar ao fragment anterior
                 }
         }
-    }*/
+    }
 
     private fun filterEditText() {
         val editTextId = binding.editTextId
@@ -382,7 +417,7 @@ class RotasFragment : Fragment() {
         editTextCombustivel.filters = arrayOf(MaxLengthInputFilter(9)) // Limite de 9 caracteres
     }  // ok
 
-    private fun validaçãoInstantânea() {
+    private fun validatorInstantaneous() {
         // Chamando a função para configurar validação instantânea para cada campo relevante
         setupInstantValidationForField(binding.editTextData, binding.textInputLayoutData)
         setupInstantValidationForField(binding.editTextId, binding.textInputLayoutId)
@@ -417,7 +452,7 @@ class RotasFragment : Fragment() {
         )
     }  // ok
 
-    private fun setupDiariaField() {
+    private fun setupDiaryField() {
         val cidadesArray = resources.getStringArray(R.array.valores_cidades_array)
         val adapter = ArrayAdapter(
             requireContext(),
@@ -537,7 +572,7 @@ class RotasFragment : Fragment() {
         return isValid
     } // ok
 
-    private fun calcularDiaria(): Int {
+    private fun calculatorDiary(): Int {
         // Formate os campos de pedágio e combustível
         binding.editTextPedagio.setText(formatCurrencyField(binding.editTextPedagio.text.toString()))
         binding.editTextCombustivel.setText(formatCurrencyField(binding.editTextCombustivel.text.toString()))
@@ -659,7 +694,6 @@ class RotasFragment : Fragment() {
         val pedagioCentavos = convertCurrencyToCents(pedagio)
         val combustivelCentavos = convertCurrencyToCents(combustivel)
 
-        Log.d("Debug", "Valor de diaria: $diaria")
         val currencyFormat = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
         val diariaValue = currencyFormat.parse(diaria)?.toDouble() ?: 0.0
         val diariaCentavos = (diariaValue * 100).toInt()
@@ -673,26 +707,14 @@ class RotasFragment : Fragment() {
         val adicionalValue = adicionalFormatted.toDoubleOrNull() ?: 0.0
         val adicionalCentavos = (adicionalValue * 100).toInt()
 
-        // Obter o dia da semana
-        val calendar = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val date = dateFormat.parse(data) // Converte a string de data para um objeto Date
-        calendar.time = date
-        val diaDaSemana = when (calendar.get(Calendar.DAY_OF_WEEK)) {
-            Calendar.SUNDAY -> "Domingo"
-            Calendar.MONDAY -> "Segunda-feira"
-            Calendar.TUESDAY -> "Terça-feira"
-            Calendar.WEDNESDAY -> "Quarta-feira"
-            Calendar.THURSDAY -> "Quinta-feira"
-            Calendar.FRIDAY -> "Sexta-feira"
-            Calendar.SATURDAY -> "Sábado"
-            else -> ""
-        }
+        // Calcular o novo dia da semana com base na nova data
+        val novaData = binding.editTextData.text.toString().trim()
+        val novoDiaDaSemana = calculateDayOfWeek(novaData)
+
 
         return RotaData(
-            //idRota = "",
             numRota = numRota,
-            diaDaSemana = diaDaSemana,
+            diaDaSemana = novoDiaDaSemana,
             descricaoCidades = descricaoCidades,
             codRota = codRota,
             km = km,
@@ -705,6 +727,24 @@ class RotasFragment : Fragment() {
             adicionalCentavos = adicionalCentavos
         )
     } // ok
+
+    private fun calculateDayOfWeek(data: String): String {
+        val calendar = Calendar.getInstance()
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val date = dateFormat.parse(data) // Converte a string de data para um objeto Date
+        calendar.time = date
+
+        return when (calendar.get(Calendar.DAY_OF_WEEK)) {
+            Calendar.SUNDAY -> "Domingo"
+            Calendar.MONDAY -> "Segunda-feira"
+            Calendar.TUESDAY -> "Terça-feira"
+            Calendar.WEDNESDAY -> "Quarta-feira"
+            Calendar.THURSDAY -> "Quinta-feira"
+            Calendar.FRIDAY -> "Sexta-feira"
+            Calendar.SATURDAY -> "Sábado"
+            else -> ""
+        }
+    }
 
     private fun resetButtonAndFields() {
         setFormFieldsEnabled(true)

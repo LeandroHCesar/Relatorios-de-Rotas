@@ -187,18 +187,20 @@ class HomeFragment : Fragment() {
             // Ordena a lista pelo campo "data" decrescentemente sortedBy
             val sortedRotasList = rotasList.sortedByDescending { it.data }
 
-            val rotasAdapter = RotasAdapter(requireContext(), sortedRotasList) { rota ->
-                openEditForm(rota)
+            val rotasAdapter = RotasAdapter(requireContext(), sortedRotasList) { rota, position ->
+                openEditForm(rota, position) // Passar a posição também
             }
             recyclerView.adapter = rotasAdapter
-            //rotasAdapter.notifyDataSetChanged()  // Notifica o adaptador das alterações
         }
     }
 
-    private fun openEditForm(rota: RotaData) {
+    private fun openEditForm(rota: RotaData, position: Int) {
+        Log.d("Debug", "Opening edit form for rota: $rota at position: $position")
+
         val fragmentRotas = RotasFragment()
         val args = Bundle()
         args.putParcelable("rota", rota)
+        args.putInt("position", position)
         fragmentRotas.arguments = args
         fragmentRotas.isEditMode = true
 
@@ -208,7 +210,6 @@ class HomeFragment : Fragment() {
         fragmentTransaction.replace(R.id.nav_host_fragment, fragmentRotas)
         fragmentTransaction.addToBackStack(null) // Para adicionar à pilha de fragmentos
         fragmentTransaction.commit()
-
     }
 
     // Em seguida, implemente a função logoutUser() que mostra um AlertDialog de confirmação e realiza o logout:

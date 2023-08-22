@@ -5,7 +5,7 @@ import android.os.Parcelable
 
 data class RotaData(
     var idRota: String = "",
-    val diaDaSemana: String = "",
+    var diaDaSemana: String = "",
     var data: String = "",
     var numRota: String = "",
     var descricaoCidades: String = "",
@@ -15,7 +15,7 @@ data class RotaData(
     var pacotes: String = "",
     var pedagioCentavos: Int = 0,
     var combustivelCentavos: Int = 0,
-    val diariaCentavos: Int = 0,
+    var diariaCentavos: Int = 0,
     var adicionalCentavos: Int = 0
 ) : Parcelable {
 

@@ -13,7 +13,8 @@ import com.relatriosderotas.helper.RotaData
 class RotasAdapter(
     private val context: Context,
     private val rotasList: List<RotaData>,
-    var onItemClick: ((RotaData) -> Unit)? = null
+    var onItemClick: ((RotaData, Int) -> Unit)? = null
+
 ) : RecyclerView.Adapter<RotasViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
@@ -30,8 +31,9 @@ class RotasAdapter(
     override fun onBindViewHolder(holder: RotasViewHolder, position: Int) {
         val rota = rotasList[position]
         holder.bind(rota)
+
         holder.editIcon.setOnClickListener {
-            onItemClick?.let { it1 -> it1(rota) }
+            onItemClick?.invoke(rota, position)
         }
     }
 }
