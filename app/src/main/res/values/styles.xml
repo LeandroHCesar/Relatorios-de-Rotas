@@ -21,6 +21,17 @@
         <item name="android:textColor">@color/color_text_principal</item>
     </style>
 
+    <!-- Estilos para os TextInputLayouts usados para campos pequenos   -->
+    <style name="TextInputEditText_form_small">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">14sp</item>
+        <item name="endIconMode">clear_text</item>
+        <item name="boxStrokeColor">@color/color_default</item>
+        <item name="hintTextColor">@color/colorHintText</item>
+        <item name="android:textColorHint">@color/colorHintText</item>
+    </style>
+
     <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -47,16 +58,8 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/bg_form</item>
         <item name="android:padding">8dp</item>
-        <item name="android:layout_marginTop">10dp</item>
-    </style>
-
-    <!-- Estilos para os TextInputLayouts usados para campos pequenos   -->
-    <style name="TextInputEditText_form_small">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">14sp</item>
-        <item name="hintTextColor">@color/colorHintText</item>
-        <item name="android:textColorHint">@color/colorHintText</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="elevation">8dp</item>
     </style>
 
     <!-- Estilos para os TextInputLayouts usados para campos diaria   -->
@@ -64,6 +67,7 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">14sp</item>
+        <item name="boxStrokeColor">@color/color_default</item>
         <item name="hintTextColor">@color/colorHintText</item>
         <item name="android:textColorHint">@color/colorHintText</item>
     </style>

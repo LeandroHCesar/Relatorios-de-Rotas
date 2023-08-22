@@ -3,172 +3,172 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_marginHorizontal="6dp"
-    android:layout_marginTop="6dp"
-    android:background="@drawable/bg_form"
-    android:padding="12dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_margin="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
 
-        <TextView
-            android:id="@+id/textWeekDay"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:text="Dia da Semana"
-            android:textSize="18sp"
-            android:textColor="@color/black"/>
+            android:orientation="vertical"
+            android:padding="12dp">
 
-        <TextView
-            android:id="@+id/textData"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:text="13/08/2023"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:gravity="center"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
-        <ImageView
-            android:id="@+id/editIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_edit"
-            android:contentDescription="Edit Icon"
-            android:layout_gravity="center_vertical"/>
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/textWeekDay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    tools:text="Dia da Semana"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/textData"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:gravity="center"
+                    tools:text="13/08/2023"/>
 
-        <TextView
-            android:id="@+id/textCity"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_weight="1"
-            tools:text="Lista de cidades"
-            android:textSize="16sp"/>
+                <ImageView
+                    android:id="@+id/editIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_edit"
+                    android:contentDescription="Edit Icon"/>
+            </LinearLayout>
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/textCity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="16sp"
+                tools:text="Lista de cidades"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:orientation="horizontal"
-        android:gravity="center">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/textId"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:text="Id da rota"
-            android:textSize="16sp"
-            android:gravity="start"/>
+                <TextView
+                    android:id="@+id/textId"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:gravity="start"
+                    tools:text="Id da rota"/>
 
-        <TextView
-            android:id="@+id/textCodRod"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:text="Cod da rota"
-            android:textSize="16sp"
-            android:gravity="end"/>
+                <TextView
+                    android:id="@+id/textCodRod"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:gravity="end"
+                    tools:text="Cod da rota"/>
+            </LinearLayout>
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/textParadas"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:gravity="start"
+                    tools:text="Paradas"/>
 
-        <TextView
-            android:id="@+id/textParadas"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:text="Paradas"
-            android:textSize="16sp"
-            android:gravity="start"/>
+                <TextView
+                    android:id="@+id/textPacotes"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    tools:text="Pacotes"/>
 
-        <TextView
-            android:id="@+id/textPacotes"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:text="Pacotes"
-            android:textSize="16sp"
-            android:gravity="center"/>
+                <TextView
+                    android:id="@+id/textKm"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:gravity="end"
+                    tools:text="Km"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/textKm"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:text="Km"
-            android:textSize="16sp"
-            android:gravity="end"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/textPedagio"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:gravity="start"
+                    tools:text="Pedágio"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/textCombustivel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:gravity="end"
+                    tools:text="Combustível"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/textPedagio"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:text="Pedagio"
-            android:textSize="16sp"
-            android:gravity="start"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/textCombustivel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:text="Combustivel"
-            android:textSize="16sp"
-            android:gravity="end"/>
+                <TextView
+                    android:id="@+id/textAdicional"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:gravity="start"
+                    tools:text="Adicional"/>
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/textDiaria"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:gravity="end"
+                    tools:text="Diária"/>
+            </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/textAdicional"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:text="Adicional"
-            android:textSize="16sp"
-            android:gravity="start"/>
-
-        <TextView
-            android:id="@+id/textDiaria"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:text="Diária"
-            android:textSize="16sp"
-            android:gravity="end"/>
-    </LinearLayout>
-
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

@@ -1,7 +1,6 @@
 package com.relatriosderotas.ui.auth
 
 import android.os.Bundle
-import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -13,15 +12,11 @@ import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.relatriosderotas.R
 import com.relatriosderotas.databinding.FragmentRegisterBinding
 import com.relatriosderotas.helper.KeyboardUtils
-import com.relatriosderotas.helper.UserInformation
+import com.relatriosderotas.helper.UserDetails
 
 class RegisterFragment : Fragment() {
 
@@ -40,53 +35,61 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        database = FirebaseDatabase.getInstance()
+        auth = FirebaseAuth.getInstance()
+        setupClickListeners()
+        fillFieldsFromArguments()
+    }
 
-        database = Firebase.database
-        auth = Firebase.auth
-        initClicks()
+    private fun setupClickListeners() {
+        binding.buttonRegister.setOnClickListener {
+            validateAndRegister()
+            KeyboardUtils.hideKeyboard(requireContext(), it)
+        }
+    }
 
-        // Verificar se existem argumentos recebidos da LoginFragment
+    private fun fillFieldsFromArguments() {
         val args = arguments
         if (args != null) {
             val email = args.getString("email")
             val password = args.getString("password")
             if (!email.isNullOrEmpty() && !password.isNullOrEmpty()) {
-                // Preencher os campos com o email e senha recebidos
                 binding.editTextEmail.setText(email)
                 binding.editTextPassword.setText(password)
             }
         }
     }
 
-    private fun initClicks() {
-        binding.buttonRegister.setOnClickListener {
-            validateData()
-            KeyboardUtils.hideKeyboard(requireContext(), it)
-        }
-    }
-
-    private fun validateData() {
+    private fun validateAndRegister() {
         val name = binding.editTextUserName.text.toString().trim()
         val email = binding.editTextEmail.text.toString().trim()
         val password = binding.editTextPassword.text.toString().trim()
 
-        // Verificar se todos os campos estão preenchidos
+        val nameLayout = binding.textInputLayoutUserName
+        val emailLayout = binding.textInputLayoutEmail
+        val passwordLayout = binding.textInputLayoutPassword
+
         if (name.isEmpty()) {
-            binding.editTextUserName.error = "Informe seu nome"
+            nameLayout.error = "Informe seu nome"
             return
+        } else {
+            nameLayout.error = null
         }
-        if (email.isEmpty()) {
-            binding.editTextEmail.error = "Informe seu e-mail"
+
+        if (email.isEmpty() || !isValidEmail(email)) {
+            emailLayout.error = "Informe um e-mail válido"
             return
+        } else {
+            emailLayout.error = null
         }
-        if (!isValidEmail(email)) {
-            binding.editTextEmail.error = "E-mail inválido"
-            return
-        }
+
         if (password.isEmpty()) {
-            binding.editTextPassword.error = "Informe sua senha"
+            passwordLayout.error = "Informe sua senha"
             return
+        } else {
+            passwordLayout.error = null
         }
+
         binding.progressBar.isVisible = true
         registerUser(email, password, name)
     }
@@ -96,76 +99,47 @@ class RegisterFragment : Fragment() {
     }
 
     private fun registerUser(email: String, password: String, name: String) {
-        Log.d("RegisterFragment", "Registering user with email: $email, password: $password")
 
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(requireActivity()) { task ->
-                binding.progressBar.isVisible = false
+
                 if (task.isSuccessful) {
                     val userId = auth.currentUser?.uid
 
-                    // Criar um objeto User com os dados do usuário
-                    val user = UserInformation(userId!!, name, email)
+                    val userDetailsRef: DatabaseReference = database.reference
+                        .child("meus_apps")
+                        .child("relatorio_de_rotas")
+                        .child("userDetails")
+                        .child(userId.toString())
 
-                    // Referência para o nó "meus_apps"
-                    val meusAppsRef: DatabaseReference = database.reference.child("meus_apps")
+                    val userDetails = UserDetails(userId!!, name, email, /* outros campos */)
 
-                    // Referência para o nó "relatorio_de_rotas" dentro de "meus_apps"
-                    val relatorioRef: DatabaseReference = meusAppsRef.child("relatorio_de_rotas")
-
-                    // Referência para o nó "users" dentro de "relatorio_de_rotas"
-                    val usersRef: DatabaseReference = relatorioRef.child("users")
-
-                    // Referência para o nó correspondente ao userId dentro de "users"
-                    val userAppRef: DatabaseReference = usersRef.child(userId)
-
-                    //Salvando o objeto User no nó correspondente ao userId dentro de "users"
-                    userAppRef.setValue(user)
-                        .addOnCompleteListener { userAppSaveTask ->
-                            if (userAppSaveTask.isSuccessful) {
-                                Log.d("RegisterFragment", "User info saved in new structure successfully.")
-
-                                // Redirecionar para a HomeFragment
-                                findNavController().apply {
-                                    navigate(R.id.action_registerFragment_to_homeFragment)
-                                    popBackStack(R.id.loginFragment, false)
-                                }
+                    userDetailsRef.setValue(userDetails)
+                        .addOnCompleteListener { userDetailsSaveTask ->
+                            if (userDetailsSaveTask.isSuccessful) {
+                                navigateToHome()
                             } else {
-                                Log.e("RegisterFragment", "Error saving user info in new structure:", userAppSaveTask.exception)
-                                handleRegisterError(userAppSaveTask.exception)
+                                handleRegisterError(userDetailsSaveTask.exception)
                             }
                         }
                 } else {
-                    // Tratar falhas ao registrar o usuário
                     handleRegisterError(task.exception)
                 }
             }
     }
 
+    private fun navigateToHome() {
+        val action = RegisterFragmentDirections.actionRegisterFragmentToHomeFragment()
+        findNavController().navigate(action)
+    }
+
     private fun handleRegisterError(exception: Exception?) {
-        when (exception) {
-            is FirebaseAuthInvalidCredentialsException -> {
-                Toast.makeText(
-                    requireContext(),
-                    "Credenciais inválidas",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            is FirebaseAuthUserCollisionException -> {
-                Toast.makeText(
-                    requireContext(),
-                    "Usuário já registrado com este e-mail",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            else -> {
-                Toast.makeText(
-                    requireContext(),
-                    "Erro ao registrar usuário",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+        val errorMessage = when (exception) {
+            is FirebaseAuthInvalidCredentialsException -> "Credenciais inválidas"
+            is FirebaseAuthUserCollisionException -> "Usuário já registrado com este e-mail"
+            else -> "Erro ao registrar usuário"
         }
+        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {
