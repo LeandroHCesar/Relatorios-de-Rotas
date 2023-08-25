@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -32,7 +33,7 @@ class RotasAdapter(
         val rota = rotasList[position]
         holder.bind(rota)
 
-        holder.editIcon.setOnClickListener {
+        holder.editButton.setOnClickListener {
             onItemClick?.invoke(rota, position)
         }
     }
@@ -52,7 +53,8 @@ class RotasViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val textPedagio: TextView = itemView.findViewById(R.id.textPedagio)
     private val textkm: TextView = itemView.findViewById(R.id.textKm)
 
-    val editIcon: ImageView = itemView.findViewById(R.id.editIcon)
+    //val editIcon: ImageView = itemView.findViewById(R.id.editIcon)
+    val editButton: Button = itemView.findViewById(R.id.editButton)
 
     fun bind(rota: RotaData) {
         val cidades = "Cidades:   ${rota.descricaoCidades}"

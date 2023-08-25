@@ -1,13 +1,16 @@
 package com.relatriosderotas.ui
 
-import android.content.Context
+import android.content.IntentFilter
 import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -28,13 +31,13 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
-import com.relatriosderotas.helper.DatabaseHelper
 import com.relatriosderotas.adapter.RotasAdapter
 import com.relatriosderotas.databinding.FragmentHomeBinding
+import com.relatriosderotas.helper.DatabaseHelper
 import com.relatriosderotas.helper.RotaData
 import com.relatriosderotas.helper.UserDetails
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListener {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -45,6 +48,8 @@ class HomeFragment : Fragment() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var recyclerView: RecyclerView
+    private lateinit var connectivityReceiver: ConnectivityReceiver
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,10 +61,14 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Inicializar a propriedade progressBar
+        progressBar = binding.progressBar
+        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        connectivityReceiver = ConnectivityReceiver(this)
+        requireContext().registerReceiver(connectivityReceiver, filter)
 
         when {
             _binding != null -> {
-
                 // Inicializar Firebase Auth
                 auth = Firebase.auth
                 val userId = auth.currentUser?.uid
@@ -72,20 +81,27 @@ class HomeFragment : Fragment() {
 
                 initToolbarAndNavigation()
                 initUserRef()
-                testingNetwork()
             }
         }
     }
 
-    private fun testingNetwork() {
-        // Verificar a conectividade à internet antes de carregar o RecyclerView
-        if (isNetworkAvailable(requireContext())) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu, menu)
+    }
+
+    override fun onConnectivityChange(isConnected: Boolean) {
+        onNetworkConnectionChanged(isConnected)
+    }
+
+    private fun onNetworkConnectionChanged(isConnected: Boolean) {
+        if (isConnected) {
+            binding.recyclerView.visibility = View.VISIBLE
+            binding.noInternetTextView.visibility = View.GONE
             setupRecyclerView()
         } else {
             binding.recyclerView.visibility = View.GONE
             binding.noInternetTextView.visibility = View.VISIBLE
         }
-
     }
 
     private fun initToolbarAndNavigation() {
@@ -100,6 +116,22 @@ class HomeFragment : Fragment() {
                 requireContext(),
                 R.style.ToolbarTitleStyle
             )
+            setHasOptionsMenu(true)
+            binding.toolbar.inflateMenu(R.menu.menu)
+            binding.toolbar.setOnMenuItemClickListener{
+                when (it.itemId) {
+                    R.id.action_search -> {
+                        // Navigate to settings screen.
+                        Toast.makeText(
+                            requireContext(),
+                            "Search clicked toolbar.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
         }
 
         // Configurar o clique no ícone do Drawer
@@ -120,15 +152,19 @@ class HomeFragment : Fragment() {
                 }
 
                 R.id.nav_datas -> {
-                    findNavController().navigate(R.id.action_homeFragment_to_personalDataFragment)
+                    val navController = findNavController()
+                    navController.popBackStack(R.id.homeFragment, false) // Remove o fragmento anterior da pilha
+                    navController.navigate(R.id.action_homeFragment_to_personalDataFragment)
                     drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
                     true // Indicar que o clique foi tratado com sucesso
                 }
 
                 R.id.nav_rota -> {
-                    findNavController().navigate(R.id.action_homeFragment_to_rotasFragment)
-                    drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
-                    true // Indicar que o clique foi tratado com sucesso
+                    val navController = findNavController()
+                    navController.popBackStack(R.id.homeFragment, false) // Remove o fragmento anterior da pilha
+                    navController.navigate(R.id.action_homeFragment_to_rotasFragment)
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                    true// Indicar que o clique foi tratado com sucesso
                 }
                 // Outros itens do menu aqui, se houver
                 else -> false // Indicar que o clique não foi tratado
@@ -167,18 +203,11 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun isNetworkAvailable(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        val activeNetwork = connectivityManager.activeNetwork
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-
-        return networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-    }
-
     private fun setupRecyclerView() {
         recyclerView = requireView().findViewById(R.id.recyclerView)
+
+        // Mostra o ProgressBar enquanto carrega os dados
+        progressBar.visibility = View.VISIBLE
 
         DatabaseHelper.getRotasFromDatabase { rotasList ->
             val layoutManager = LinearLayoutManager(requireContext())
@@ -191,6 +220,10 @@ class HomeFragment : Fragment() {
                 openEditForm(rota, position) // Passar a posição também
             }
             recyclerView.adapter = rotasAdapter
+            // Usar um ViewTreeObserver para esperar a renderização da UI e, em seguida, esconder a progressBar
+            recyclerView.viewTreeObserver.addOnGlobalLayoutListener {
+                progressBar.visibility = View.GONE
+            }
         }
     }
 
@@ -210,6 +243,12 @@ class HomeFragment : Fragment() {
         fragmentTransaction.replace(R.id.nav_host_fragment, fragmentRotas)
         fragmentTransaction.addToBackStack(null) // Para adicionar à pilha de fragmentos
         fragmentTransaction.commit()
+
+        // Limpar a pilha de backstack
+        val fragmentCount = fragmentManager.backStackEntryCount
+        for (i in 0 until fragmentCount) {
+            fragmentManager.popBackStackImmediate()
+        }
     }
 
     // Em seguida, implemente a função logoutUser() que mostra um AlertDialog de confirmação e realiza o logout:
@@ -246,5 +285,6 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        requireContext().unregisterReceiver(connectivityReceiver)
     }
 }

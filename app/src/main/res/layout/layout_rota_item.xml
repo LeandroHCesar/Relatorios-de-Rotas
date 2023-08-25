@@ -43,13 +43,23 @@
                     android:textColor="@color/black"
                     android:gravity="center"
                     tools:text="13/08/2023"/>
-
-                <ImageView
+                    <!--<ImageView
                     android:id="@+id/editIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_edit"
-                    android:contentDescription="Edit Icon"/>
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:contentDescription="Edit Icon"/>-->
+                <Button
+                    android:id="@+id/editButton"
+                    style="@style/ButtonItemStyle"
+                    android:background="@drawable/circle_button_background"
+                    android:layout_gravity="center_vertical"
+                    android:contentDescription="Edit Icon"
+                    android:text=""
+                    android:gravity="center_vertical"/>
+                <!--android:drawableEnd="@drawable/ic_edit"-->
             </LinearLayout>
 
             <TextView
