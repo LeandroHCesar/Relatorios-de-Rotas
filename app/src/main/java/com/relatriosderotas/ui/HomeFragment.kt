@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
@@ -30,26 +29,30 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import com.relatriosderotas.R
 import com.relatriosderotas.adapter.RotasAdapter
 import com.relatriosderotas.databinding.FragmentHomeBinding
 import com.relatriosderotas.helper.DatabaseHelper
 import com.relatriosderotas.helper.RotaData
-import com.relatriosderotas.helper.UserDetails
+import com.relatriosderotas.helper.Users
 
 class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListener {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private lateinit var auth: FirebaseAuth
-    private var database: FirebaseDatabase = FirebaseDatabase.getInstance()
-    private val databaseRef: DatabaseReference = database.reference
-    private lateinit var userRef: DatabaseReference
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var recyclerView: RecyclerView
     private lateinit var connectivityReceiver: ConnectivityReceiver
     private lateinit var progressBar: ProgressBar
+    private lateinit var calendarView: MaterialCalendarView
+
+    private lateinit var auth: FirebaseAuth
+    private var database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val databaseRef: DatabaseReference = database.reference
+    private lateinit var userRef: DatabaseReference
+    private lateinit var valueEventListenerUser: ValueEventListener
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,32 +64,35 @@ class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Inicializar a propriedade progressBar
-        progressBar = binding.progressBar
-        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        connectivityReceiver = ConnectivityReceiver(this)
-        requireContext().registerReceiver(connectivityReceiver, filter)
 
         when {
             _binding != null -> {
-                // Inicializar Firebase Auth
-                auth = Firebase.auth
-                val userId = auth.currentUser?.uid
-                if (userId != null) {
-                    // Referência para o banco de dados "users" no Firebase Realtime Database
-                    userRef =
-                        databaseRef.child("meus_apps").child("relatorio_de_rotas").child("userDetails")
-                            .child(userId)
-                }
-
+                Log.d("HomeFragment", "Inside when block")
+                // Inicializar a propriedade progressBar
+                progressBar = binding.progressBar
+                val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+                connectivityReceiver = ConnectivityReceiver(this)
+                requireContext().registerReceiver(connectivityReceiver, filter)
+                initFirebaseAuth()
                 initToolbarAndNavigation()
-                initUserRef()
+                configCalendarView()
             }
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu, menu)
+    private fun initFirebaseAuth() {
+        // Inicializar Firebase Auth
+        auth = Firebase.auth
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            // Referência para o banco de dados "users" no Firebase Realtime Database
+            userRef =
+                databaseRef.child("meus_apps")
+                    .child("relatorio_de_rotas")
+                    .child("usuarios")
+                    .child(userId)
+                    .child("user")
+        }
     }
 
     override fun onConnectivityChange(isConnected: Boolean) {
@@ -118,7 +124,7 @@ class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListen
             )
             setHasOptionsMenu(true)
             binding.toolbar.inflateMenu(R.menu.menu)
-            binding.toolbar.setOnMenuItemClickListener{
+            binding.toolbar.setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.action_search -> {
                         // Navigate to settings screen.
@@ -129,6 +135,7 @@ class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListen
                         ).show()
                         true
                     }
+
                     else -> false
                 }
             }
@@ -153,7 +160,10 @@ class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListen
 
                 R.id.nav_datas -> {
                     val navController = findNavController()
-                    navController.popBackStack(R.id.homeFragment, false) // Remove o fragmento anterior da pilha
+                    navController.popBackStack(
+                        R.id.homeFragment,
+                        false
+                    ) // Remove o fragmento anterior da pilha
                     navController.navigate(R.id.action_homeFragment_to_personalDataFragment)
                     drawerLayout.closeDrawer(GravityCompat.START) // Fechar o Drawer após o clique
                     true // Indicar que o clique foi tratado com sucesso
@@ -161,7 +171,10 @@ class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListen
 
                 R.id.nav_rota -> {
                     val navController = findNavController()
-                    navController.popBackStack(R.id.homeFragment, false) // Remove o fragmento anterior da pilha
+                    navController.popBackStack(
+                        R.id.homeFragment,
+                        false
+                    ) // Remove o fragmento anterior da pilha
                     navController.navigate(R.id.action_homeFragment_to_rotasFragment)
                     drawerLayout.closeDrawer(GravityCompat.START)
                     true// Indicar que o clique foi tratado com sucesso
@@ -173,11 +186,11 @@ class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListen
 
     }
 
-    private fun initUserRef() {
-        userRef.addValueEventListener(object : ValueEventListener {
+    private fun initUser() {
+        valueEventListenerUser = userRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (_binding != null && isAdded) { // Verifique se o fragmento está vinculado à atividade
-                    val user = snapshot.getValue(UserDetails::class.java)
+                    val user = snapshot.getValue(Users::class.java)
                     if (user != null) {
                         val userName = user.userName
                         val userEmail = user.email
@@ -187,6 +200,8 @@ class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListen
                         val headerView = binding.navigationView.getHeaderView(0)
                         headerView.findViewById<TextView>(R.id.textViewNome).text = userName
                         headerView.findViewById<TextView>(R.id.textViewEmail).text = userEmail
+                        val textName = binding.textName
+                        textName.text = "Olá, ${userName}"
                     }
                 }
             }
@@ -195,7 +210,7 @@ class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListen
                 if (isAdded) { // Verifique se o fragmento está vinculado à atividade
                     Toast.makeText(
                         requireContext(),
-                        "Erro ao recuperar os dados do usuário.",
+                        "Erro ao recuperar os dados do usuário. $error",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -227,6 +242,17 @@ class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListen
         }
     }
 
+    private fun configCalendarView() {
+        Log.d("HomeFragment", "configCalendarView called")
+
+        calendarView = binding.calendarView
+        calendarView.setOnMonthChangedListener { widget, date ->
+            val selectedMonth = date.month
+            val selectedYear = date.year
+            Log.d("data", "calendarView: ${date.month} ${date.year}")
+        }
+    }
+
     private fun openEditForm(rota: RotaData, position: Int) {
         Log.d("Debug", "Opening edit form for rota: $rota at position: $position")
 
@@ -251,7 +277,10 @@ class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListen
         }
     }
 
-    // Em seguida, implemente a função logoutUser() que mostra um AlertDialog de confirmação e realiza o logout:
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu, menu)
+    }
+
     private fun logoutUser() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Confirmação")
@@ -273,13 +302,20 @@ class HomeFragment : Fragment(), ConnectivityReceiver.OnConnectivityChangeListen
 
     override fun onStart() {
         super.onStart()
-
+        initUser()
+        Log.i("evento", "onStart: listener iniciado")
         // Verificar se o usuário está logado
         val currentUser = auth.currentUser
         if (currentUser == null) {
             // Caso o usuário não esteja logado, navegue para o LoginFragment
             findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        userRef.removeEventListener(valueEventListenerUser)
+        Log.d("evento", "onStop: listener removido")
     }
 
     override fun onDestroyView() {

@@ -1,7 +1,15 @@
 package com.relatriosderotas.helper
 
 data class UserDetails(
-    val userId: String? = null,
-    val userName : String? = null,
-    val email: String? = null
+    val nomeCompleto: String = "",
+    val cpf: String = "",
+    val veiculo: String = "",
+    val placa: String = "",
+    val titular: String = "",
+    val cnpj: String = "",
+    val banco: String = "",
+    val agencia: String = "",
+    val conta: String = "",
+    val pix: String = ""
+    // Adicione outros campos aqui, se houver
 )

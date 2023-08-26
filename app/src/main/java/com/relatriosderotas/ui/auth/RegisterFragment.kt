@@ -16,7 +16,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.relatriosderotas.databinding.FragmentRegisterBinding
 import com.relatriosderotas.helper.KeyboardUtils
-import com.relatriosderotas.helper.UserDetails
+import com.relatriosderotas.helper.Users
 
 class RegisterFragment : Fragment() {
 
@@ -109,10 +109,11 @@ class RegisterFragment : Fragment() {
                     val userDetailsRef: DatabaseReference = database.reference
                         .child("meus_apps")
                         .child("relatorio_de_rotas")
-                        .child("userDetails")
+                        .child("usuarios")
                         .child(userId.toString())
+                        .child("user")
 
-                    val userDetails = UserDetails(userId!!, name, email, /* outros campos */)
+                    val userDetails = Users(userId!!, name, email, /* outros campos */)
 
                     userDetailsRef.setValue(userDetails)
                         .addOnCompleteListener { userDetailsSaveTask ->

@@ -24,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.relatriosderotas.R
 import com.relatriosderotas.databinding.FragmentRotasBinding
+import com.relatriosderotas.helper.DateCustom
 import com.relatriosderotas.helper.MaxLengthInputFilter
 import com.relatriosderotas.helper.RotaData
 import java.text.DecimalFormat
@@ -37,11 +38,17 @@ class RotasFragment : Fragment() {
 
     private var _binding: FragmentRotasBinding? = null
     private val binding get() = _binding!!
-
     private var shouldShowDiariaDropdown = true
     private var calculatedDiariaValue: Int = 0
-
     var isEditMode = false
+    private var selectedYear: Int = -1
+    private var selectedMonth: Int = -1
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        selectedYear = arguments?.getInt("selectedYear") ?: -1
+        selectedMonth = arguments?.getInt("selectedMonth") ?: -1
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,6 +64,7 @@ class RotasFragment : Fragment() {
         // Certifique-se de que _binding não seja nulo antes de usá-lo
         when {
             _binding != null -> {
+
                 setupUI()
                 // Verifique se há argumentos passados ao fragmento
                 val arguments = arguments
@@ -100,10 +108,6 @@ class RotasFragment : Fragment() {
             requireActivity().onBackPressed()
         }
     }  // ok
-
-    private fun performCalculation() {
-
-    }
 
     private fun buttonsClicks() {
         val rota = arguments?.getParcelable<RotaData>("rota")
@@ -181,6 +185,7 @@ class RotasFragment : Fragment() {
         binding.buttonSalvar.setOnClickListener {
             if (isFormValid()) {
                 // Modo de salvamento
+                Log.d("RotasFragment", "Save button clicked")
                 saveRotaDataToDatabase()
                 resetButtonAndFields()
                 // Agendar o fechamento do fragmento após um breve atraso
@@ -266,6 +271,14 @@ class RotasFragment : Fragment() {
     private fun saveRotaDataToDatabase() {
         val rotaData = createRotaData() // Crie o objeto RotaData com os dados
 
+        val dateCustom = DateCustom()
+        val data = binding.editTextData.text.toString().trim()
+        val retornoData = data.split("/")
+        val mesAno = dateCustom.mesAnoSelect(retornoData)
+
+        Log.d("RotasFragment", "Data: $data")
+        Log.d("RotasFragment", "MesAno: $mesAno")
+
         // Verifique se o usuário está autenticado
         val currentUser = Firebase.auth.currentUser
         if (currentUser != null) {
@@ -278,8 +291,9 @@ class RotasFragment : Fragment() {
             val rotasRef = databaseRef
                 .child("meus_apps")
                 .child("relatorio_de_rotas")
-                .child("rotas")
+                .child("services")
                 .child(userId)
+                .child(mesAno)
 
             // Use push() para criar uma nova chave única automaticamente e obter a referência
             val newRotaRef = rotasRef.push()
@@ -289,8 +303,9 @@ class RotasFragment : Fragment() {
             newRotaRef.setValue(rotaData)
                 .addOnSuccessListener {
                     // Sucesso ao salvar os dados da rota
-
                     displayMessage("Dados da rota foram salvos com sucesso.")
+                    //val fragmentManager = requireActivity().supportFragmentManager
+                    //fragmentManager.popBackStack() // Voltar ao fragment anterior
                 }
                 .addOnFailureListener { exception ->
                     // Falha ao salvar os dados da rota
@@ -360,11 +375,13 @@ class RotasFragment : Fragment() {
         val userId = currentUser?.uid
 
         if (userId != null) {
+            val mesAno = DateCustom().mesAnoSelect(novaData.split("/"))
             val rotaRef = databaseRef
                 .child("meus_apps")
                 .child("relatorio_de_rotas")
-                .child("rotas")
+                .child("services")
                 .child(userId)
+                .child(mesAno)
                 .child(rota.idRota) // Use o número da rota para acessar o nó correto
 
             rotaRef.setValue(rota)
@@ -807,7 +824,7 @@ class RotasFragment : Fragment() {
             year, month, day
         )
         datePickerDialog.show()
-    }  // ok
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -25,49 +25,71 @@
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
+                app:layout_scrollFlags="scroll|enterAlways"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/color_default"
                 app:popupTheme="@style/Theme.RelatóriosDeRotas" >
-
-                <!--<LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    &lt;!&ndash; Textos personalizados &ndash;&gt;
-                    <TextView
-                        android:id="@+id/textNomeUsuario"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="2dp"
-                        android:text="Nome do Usuário"
-                        android:textColor="@color/white"
-                        android:layout_gravity="center_horizontal" />
-
-                    <TextView
-                        android:id="@+id/textSaldo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="2dp"
-                        android:text="Seu Saldo: R$1000"
-                        android:textColor="@color/white"
-                        android:layout_gravity="center_horizontal" />
-                </LinearLayout>-->
             </androidx.appcompat.widget.Toolbar>
-
         </com.google.android.material.appbar.AppBarLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutTextSaudação"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_default"
+            android:paddingHorizontal="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:paddingBottom="4dp"
+                android:textSize="16sp"
+                android:gravity="start"
+                android:text="Carregando:"/>
+
+            <TextView
+                android:id="@+id/textSaldo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:paddingBottom="4dp"
+                android:textSize="18sp"
+                android:gravity="start"
+                android:text="Saldo: R$ 0,00"/>
+        </LinearLayout>
+
+        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layoutTextSaudação"
+            app:mcv_selectionColor="@color/color_default"
+            app:mcv_selectionMode="single"
+            app:mcv_showOtherDates="all"
+            app:mcv_tileHeight="40dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginVertical="8dp"
-            android:visibility="gone"
+            android:layout_marginBottom="8dp"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
+            app:layout_constraintTop_toBottomOf="@id/calendarView" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -75,7 +97,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_marginTop="32dp"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -88,7 +110,7 @@
             android:gravity="center_horizontal"
             android:text="Verifique a  conexão com a internet"
             android:textSize="30sp"
-            android:visibility="visible"
+            android:visibility="gone"
             tools:text="Verifique a  conexão com a internet"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

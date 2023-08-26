@@ -8,19 +8,23 @@ object DatabaseHelper {
     private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    // Referência para o nó "users" dentro da estrutura do banco de dados
+    /*// Referência para o nó "users" dentro da estrutura do banco de dados
     private val usersRef: DatabaseReference = database.reference
         .child("meus_apps")
         .child("relatorio_de_rotas")
-        .child("users")
+        .child("users")*/
 
     // Função para buscar rotas no banco de dados
     fun getRotasFromDatabase(callback: (List<RotaData>) -> Unit) {
         val userId = auth.currentUser?.uid
 
         userId?.let { uid ->
-            val rotasRef: DatabaseReference = database.reference.child("meus_apps")
-                .child("relatorio_de_rotas").child("rotas").child(uid)
+            val rotasRef: DatabaseReference = database.reference
+                .child("meus_apps")
+                .child("relatorio_de_rotas")
+                .child("services")
+                .child(uid)
+                .child("082023")
 
             rotasRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
